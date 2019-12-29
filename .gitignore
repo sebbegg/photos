@@ -1,5 +1,14 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# ide
+.idea/
+
+# python
+**/__pycache__
+
+# test-dbs
+*.sqlite
+
 # dependencies
 photos-ui/node_modules
 photos-ui/.pnp
