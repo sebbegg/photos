@@ -4,16 +4,15 @@ const Photos = ({ photos }) => {
   return (
     <div>
       <center><h1>My Photos</h1></center>
+      <div class="pure-g">
       {photos.map((photo) => (
-        <div class="card">
-          <div class="card-body">
-            <img class="card-img-top" src={"http://localhost:5000/photos/" + photo.id + "/file"} alt="Card image cap"></img>
-            <h5 class="card-title">{photo.filename}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{photo.path}</h6>
-            <p class="card-text">{photo.capture_date}</p>
+          <div class="pure-u-1-1 pure-u-md-1-2 pure-u-lg-1-4">
+            <center>
+            <img class={"pure-img exif-orient-" + photo.orientation} src={"http://localhost:5000/photos/" + photo.id + "/file"} alt={photo.id}></img>
+            </center>
           </div>
-        </div>
       ))}
+      </div>
     </div>
   )
 };

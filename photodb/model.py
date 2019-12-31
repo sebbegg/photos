@@ -24,7 +24,12 @@ Db = declarative_base()
 def with_str(cls):
     def make_str(cls, attrs):
 
-        fmt_string = cls.__name__ + "(" + ", ".join("{a}={{self.{a}!r}}".format(a=attr.key) for attr in attrs) + ")"
+        fmt_string = (
+            cls.__name__
+            + "("
+            + ", ".join("{a}={{self.{a}!r}}".format(a=attr.key) for attr in attrs)
+            + ")"
+        )
 
         def __str__(self):
             return fmt_string.format(self=self)
@@ -50,6 +55,7 @@ class Photo(Db):
     capture_date: datetime = Column(DateTime, index=True)
     added_date: datetime = Column(DateTime, index=True, default=datetime.datetime.now)
     thumbnail_data: bytes = Column(String)
+    orientation: int = Column(Integer)
 
     @classmethod
     def from_path_and_exif(cls, path, exif):
@@ -60,8 +66,16 @@ class Photo(Db):
             dt = datetime.datetime.fromtimestamp(os.stat(path).st_ctime)
 
         thumbnail_data = exif.pop("JPEGThumbnail", None)
+        orientation = exif.get("Image Orientation", 1)
         path = pathlib.Path(path)
-        return cls(path=str(path.parent), filename=path.name, exif=exif, capture_date=dt, thumbnail_data=thumbnail_data)
+        return cls(
+            path=str(path.parent),
+            filename=path.name,
+            exif=exif,
+            capture_date=dt,
+            thumbnail_data=thumbnail_data,
+            orientation=orientation,
+        )
 
 
 def photo_to_album():
