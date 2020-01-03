@@ -56,6 +56,7 @@ class Photo(Db):
     added_date: datetime = Column(DateTime, index=True, default=datetime.datetime.now)
     thumbnail_data: bytes = Column(String)
     orientation: int = Column(Integer)
+    camera: str = Column(String, index=True)
 
     @classmethod
     def from_path_and_exif(cls, path, exif):
@@ -67,6 +68,9 @@ class Photo(Db):
 
         thumbnail_data = exif.pop("JPEGThumbnail", None)
         orientation = exif.get("Image Orientation", 1)
+        camera = "/".join((exif.get("Image Make"), exif.get("Image Model")))
+        if camera == "/":
+            camera = None
         path = pathlib.Path(path)
         return cls(
             path=str(path.parent),
@@ -75,6 +79,7 @@ class Photo(Db):
             capture_date=dt,
             thumbnail_data=thumbnail_data,
             orientation=orientation,
+            camera=camera
         )
 
 
