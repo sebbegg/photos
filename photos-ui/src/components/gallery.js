@@ -1,60 +1,35 @@
-import React, { Component } from 'react';
-import PhotoBox from './photobox.js'
+import React, {Component} from 'react';
+import 'bulma/css/bulma.css'
 import Toolbar from './toolbar.js'
-
+import PhotosView from "./photosview";
 
 class Gallery extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {photos: [], selection: []};
-        this.handlePhotosLoaded = this.handlePhotosLoaded.bind(this);
-        this.handlePhotoClicked = this.handlePhotoClicked.bind(this);
+        this.state = {options: {camera: null}};
     }
 
-    componentDidMount() {
-        fetch('http://localhost:5000/photos/')
-        .then(res => res.json())
-        .then(this.handlePhotosLoaded)
-        .catch(console.log)
-    }
-
-    handlePhotosLoaded(photos) {
-        this.setState({
-            photos: photos,
-            selection: photos.reduce((a, p) => { a[p.id] = false; return a;}, {})
-        })
-    }
-
-    handlePhotoClicked(photo_id) {
-        var selection = Object.assign({}, this.state.selection);
-        selection[photo_id] = !selection[photo_id]
-        this.setState({selection: selection});
+    handleToolbarOptionsChanged(toolbarOptions) {
+        console.log("New opts:" + JSON.stringify(toolbarOptions));
+        this.setState({options: toolbarOptions});
     }
 
     render() {
-      return (
-        <div>
-          <center><h1>My Photos</h1></center>
-          <Toolbar />
-          <div className="pure-g">
-          {
-            this.state.photos.map(
-              (photo) => (
-                <PhotoBox
-                key={photo.id}
-                photo={photo}
-                selected={this.state.selection[photo.id]}
-                onClick={() => this.handlePhotoClicked(photo.id)}
-                />
-              )
-            )
-          }
-          </div>
-        </div>
-      )
+
+        let opts = {};
+        if (this.state.options.camera !== null) {
+            opts.camera = this.state.options.camera.id;
+        }
+
+        return (
+            <div>
+                <Toolbar photosApi={this.photosApi} onOptionsChanged={(o) => this.handleToolbarOptionsChanged(o)}/>
+                <PhotosView options={opts}/>
+            </div>
+        )
     };
 
-    }
+}
 
 export default Gallery

@@ -11,7 +11,8 @@
     "react-dom": "^16.12.0",
     "react-masonry-component": "^6.2.1",
     "react-modal": "^3.11.1",
-    "react-scripts": "3.3.0"
+    "react-scripts": "3.3.0",
+    "lodash": "latest"
   },
   "scripts": {
     "start": "react-scripts start",

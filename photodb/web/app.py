@@ -2,7 +2,7 @@ from flask import Flask, g, current_app
 from flask_cors import CORS
 
 from sqlalchemy import create_engine
-from .resources import photos_blueprint, scanner_blueprint
+from .resources import all_blueprints
 from photodb.model import Db
 
 from sqlalchemy.orm import sessionmaker
@@ -28,8 +28,10 @@ def create_app():
     # allow CORS
     CORS(app)
 
-    app.register_blueprint(photos_blueprint)
-    app.register_blueprint(scanner_blueprint)
+    for blueprint in all_blueprints:
+        print("Registering blueprint: %s" % blueprint.name)
+        app.register_blueprint(blueprint)
+
     app.before_request(new_session)
     app.after_request(close_session)
 

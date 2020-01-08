@@ -1,28 +1,56 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import Dropdown from './dropdown.js';
+import PhotosAPI from "./PhotosAPI";
+let _ = require('lodash');
 
 class Toolbar extends Component {
 
-  render() {
-    return (
-      <div className="pure-g">
-        <div className="pure-u-1-1">
-          <aside style={{textAlign: "right", margins: "0em 1em", color: "white", textDecoration: "none", fontSize: "150%"}}>
-            <span>
-              <a href="#">
-                <i className="fas fa-cogs"></i>
-              </a>
-              <a href="#">
-                <i class="fas fa-filter"></i>
-              </a>
-              <a href="#">
-                <i className="far fa-arrow-alt-circle-down"></i>
-              </a>
-            </span>
-          </aside>
-        </div>
-      </div>
-    );
-  }
+    constructor(props) {
+        super(props);
+        this.state = {options: {camera: null}, choices: {cameras: []}};
+        this.photosApi = new PhotosAPI();
+    }
+
+    componentDidMount() {
+        this.photosApi.getDistinctCameras().then((c) => this.handleCamerasLoaded(c));
+        this.fireOnOptionsChanged(this.state.options);
+    }
+
+    handleCamerasLoaded(cameras) {
+        this.setState({choices: {cameras: cameras}});
+    }
+
+    handleDropdownChanged(key, data) {
+        let state = {options: {}};
+        state.options[key] = data;
+        this.setState(state);
+        this.fireOnOptionsChanged(state.options);
+    }
+
+    fireOnOptionsChanged(opts) {
+        if (this.props.onOptionsChanged) {
+            this.props.onOptionsChanged(_.cloneDeep(opts));
+        }
+    }
+
+    render() {
+        const cameras = this.state.choices.cameras.map(camera => ({id: camera, text: camera}));
+
+        return (
+            <nav className="level">
+                <div className="level-left"/>
+                <div className="level-right">
+                    <div className="level-item">
+                        <Dropdown
+                            items={cameras}
+                            icon="fas fa fa-camera-retro"
+                            noSelectionText="All cameras"
+                            onSelectionChanged={(selection) => this.handleDropdownChanged("camera", selection)}/>
+                    </div>
+                </div>
+            </nav>
+        );
+    }
 }
 
 export default Toolbar;

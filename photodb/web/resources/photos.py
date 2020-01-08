@@ -79,18 +79,17 @@ class PhotoFiles(Resource):
             image.save(file_to_send, "jpeg")
             file_to_send.seek(0)
 
-        print(f"Delivering: {photo.path}/{photo.filename}")
         return send_file(file_to_send, as_attachment=args.download, attachment_filename=photo.filename)
 
 
-@ns.route("/")
+@ns.route("")
 class PhotosList(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
         "page", type=int, default=1, help="Page no. to return",
     )
     parser.add_argument(
-        "pagesize", type=int, default=20, help="Page no. to return",
+        "pagesize", type=int, default=20, help="Page size",
     )
     parser.add_argument(
         "album", type=str, default=None, help="Return photos only from album",
@@ -122,3 +121,10 @@ class PhotosList(Resource):
 
         query = query.order_by(Photo.capture_date.desc()).offset(offset).limit(args.pagesize)
         return query.all()
+
+
+@ns.route("/cameras")
+class PhotoStats(Resource):
+
+    def get(self):
+        return [row.camera for row in g.session.query(Photo.camera).distinct()]
