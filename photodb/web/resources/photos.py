@@ -2,7 +2,7 @@ import io
 import os
 
 import PIL.Image
-from flask import Blueprint, g, abort, send_file
+from flask import Blueprint, g, abort, send_file, request
 from flask_restplus import Api, Resource, reqparse, inputs
 
 from photodb.model import Photo, Album
@@ -52,16 +52,27 @@ class PhotoFiles(Resource):
         "size", type=int, default=500, help="Crop image to be at most this many pixels high or wide",
     )
     parser.add_argument(
-        "download", type=inputs.boolean, default="false", help="If 'true', return image as attachment",
+        "download", type=inputs.boolean, default=False, help="If 'true', return image as attachment",
     )
     parser.add_argument(
-        "unmodified", type=inputs.boolean, default="false", help="If true, return unmodified original image",
+        "unmodified", type=inputs.boolean, default=False, help="If true, return unmodified original image",
     )
+
+    @classmethod
+    def etag(cls, photo: Photo):
+
+        p = os.path
+        filepath = p.join(photo.path, photo.filename)
+        return "%s-%s-%s" % (p.getmtime(filepath), p.getsize(filepath), photo.id)
 
     def get(self, id: int):
         photo = g.session.query(Photo).get(id)
         if photo is None:
             abort(404, "Photo with id %r not found" % id)
+
+        etag = self.etag(photo)
+        if etag in request.if_none_match:
+            return "", 304
 
         file_to_send = os.path.join(photo.path, photo.filename)
 
@@ -79,7 +90,9 @@ class PhotoFiles(Resource):
             image.save(file_to_send, "jpeg")
             file_to_send.seek(0)
 
-        return send_file(file_to_send, as_attachment=args.download, attachment_filename=photo.filename)
+        response = send_file(file_to_send, as_attachment=args.download, attachment_filename=photo.filename)
+        response.set_etag(etag)
+        return response
 
 
 @ns.route("")
@@ -94,9 +107,7 @@ class PhotosList(Resource):
     parser.add_argument(
         "album", type=str, default=None, help="Return photos only from album",
     )
-    parser.add_argument(
-        "camera", type=str, default=None, help="Restrict to photos from the specified camera"
-    )
+    parser.add_argument("camera", type=str, default=None, help="Restrict to photos from the specified camera")
     parser.add_argument(
         "min_date", type=inputs.datetime_from_iso8601, default=None, help="Restrict to photos captured after min_date"
     )
@@ -125,6 +136,5 @@ class PhotosList(Resource):
 
 @ns.route("/cameras")
 class PhotoStats(Resource):
-
     def get(self):
         return [row.camera for row in g.session.query(Photo.camera).distinct()]

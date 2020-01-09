@@ -17,6 +17,7 @@ class Toolbar extends Component {
     }
 
     handleCamerasLoaded(cameras) {
+
         this.setState({choices: {cameras: cameras}});
     }
 

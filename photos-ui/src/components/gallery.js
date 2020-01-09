@@ -11,7 +11,6 @@ class Gallery extends Component {
     }
 
     handleToolbarOptionsChanged(toolbarOptions) {
-        console.log("New opts:" + JSON.stringify(toolbarOptions));
         this.setState({options: toolbarOptions});
     }
 

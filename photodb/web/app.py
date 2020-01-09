@@ -35,7 +35,7 @@ def create_app():
     app.before_request(new_session)
     app.after_request(close_session)
 
-    app.config.from_mapping(SCAN_FOLDERS=["/Users/sebastianeckweiler/Pictures/Irland"])
+    app.config.from_mapping(SCAN_FOLDERS=["/Users/sebastianeckweiler/PycharmProjects/photodb/data"])
 
     engine = create_engine("sqlite:///photosdb.sqlite")
     app.sessionfactory = sessionmaker(engine)

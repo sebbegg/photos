@@ -11,7 +11,7 @@ from sqlalchemy import (
     Integer,
     Table,
     ForeignKey,
-)
+    UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -47,6 +47,7 @@ BigInt = BigInteger().with_variant(Integer, "sqlite")
 class Photo(Db):
 
     __tablename__ = "photos"
+    __table_args__ = (UniqueConstraint("path", "filename"),)
 
     id: int = Column(BigInt, autoincrement=True, primary_key=True)
     path: str = Column(String)

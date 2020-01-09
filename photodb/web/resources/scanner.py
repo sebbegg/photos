@@ -6,6 +6,7 @@ from flask_restplus import Api, Resource
 from photodb.scanner import ImageScanner
 from photodb.model import Photo
 
+
 scanner_blueprint = Blueprint("scanner", __name__)
 api = Api(scanner_blueprint)
 

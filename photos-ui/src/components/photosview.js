@@ -3,6 +3,8 @@ import 'bulma/css/bulma.css'
 import PhotoBox from './photobox.js'
 import PhotosApi from './PhotosAPI.js'
 
+let _ = require("lodash");
+
 class PhotosView extends Component {
 
     constructor(props) {
@@ -23,6 +25,9 @@ class PhotosView extends Component {
     }
 
     handlePhotosLoaded(photos) {
+        if (photos === undefined) {
+            photos = [];
+        }
         this.setState({
             photos: photos,
             selection: photos.reduce((a, p) => {
@@ -38,11 +43,18 @@ class PhotosView extends Component {
         this.setState({selection: selection});
     }
 
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (!_.isEqual(this.props.options, prevProps.options)) {
+            this.loadPhotos();
+        }
+    }
+
     render() {
 
         return (
             <div>
-                <div className="columns is-multiline">
+                <div className="columns is-multiline is-vcentered">
                     {
                         this.state.photos.map(
                             (photo) => (
