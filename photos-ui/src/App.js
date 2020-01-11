@@ -1,12 +1,33 @@
 import React, {Component} from 'react';
-import Gallery from './components/gallery.js';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import Gallery from "./components/gallery";
+import Navbar from "./components/navbar";
+import SlideShow from "./components/slideshow";
 
 
 class App extends Component {
 
     render() {
         return (
-            <Gallery/>
+            <Router>
+                <Switch>
+                    <Route path="/ui/slideshow">
+                        <SlideShow/>
+                    </Route>
+                    <Route path="/ui/gallery">
+                        <Navbar/>
+                        <Gallery/>
+                    </Route>
+                    <Route>
+                        <p>Nothing here</p>
+                    </Route>
+                </Switch>
+            </Router>
         );
     }
 }

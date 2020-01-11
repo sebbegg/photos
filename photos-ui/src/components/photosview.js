@@ -12,7 +12,6 @@ class PhotosView extends Component {
         this.state = {photos: [], selection: []};
         this.handlePhotosLoaded = this.handlePhotosLoaded.bind(this);
         this.handlePhotoClicked = this.handlePhotoClicked.bind(this);
-        this.photosApi = new PhotosApi();
     }
 
     componentDidMount() {
@@ -20,7 +19,7 @@ class PhotosView extends Component {
     }
 
     loadPhotos() {
-        this.photosApi.getPhotos(this.props.options)
+        PhotosApi.getPhotos(this.props.options)
             .then(this.handlePhotosLoaded);
     }
 

@@ -8,11 +8,10 @@ class Toolbar extends Component {
     constructor(props) {
         super(props);
         this.state = {options: {camera: null}, choices: {cameras: []}};
-        this.photosApi = new PhotosAPI();
     }
 
     componentDidMount() {
-        this.photosApi.getDistinctCameras().then((c) => this.handleCamerasLoaded(c));
+        PhotosAPI.getDistinctCameras().then((c) => this.handleCamerasLoaded(c));
         this.fireOnOptionsChanged(this.state.options);
     }
 

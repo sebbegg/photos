@@ -55,7 +55,7 @@ class PhotoFiles(Resource):
         "download", type=inputs.boolean, default=False, help="If 'true', return image as attachment",
     )
     parser.add_argument(
-        "unmodified", type=inputs.boolean, default=False, help="If true, return unmodified original image",
+        "unmodified", type=inputs.int_range(0, 100000), default=False, help="If true, return unmodified original image",
     )
 
     @classmethod
@@ -81,9 +81,8 @@ class PhotoFiles(Resource):
             image = PIL.Image.open(file_to_send)
             assert isinstance(image, PIL.Image.Image)
 
-            sz = max(0, args.size)
-            if sz < max(image.size):
-                image.thumbnail((sz, sz))
+            if 0 < args.size < max(image.size):
+                image.thumbnail((args.size, args.size))
             image = normalize_exif_orientation(image, photo.orientation)
 
             file_to_send = io.BytesIO()

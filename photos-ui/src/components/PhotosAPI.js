@@ -1,15 +1,7 @@
 class PhotosAPI {
 
-    constructor(host) {
-        host = (typeof host !== 'undefined') ? host : "http://localhost:5000";
-        if (!host.endsWith("/")) {
-            host = host + "/";
-        }
-        this.host = host;
-    }
-
-    buildURI(resource, options) {
-        let uri = this.host;
+    static buildURI(resource, options) {
+        let uri = "http://192.168.1.10:5000/";
 
         uri = uri + resource;
 
@@ -24,21 +16,25 @@ class PhotosAPI {
         return uri;
     }
 
-    buildRequest(resource, options) {
+    static buildRequest(resource, options) {
         return fetch(this.buildURI(resource, options))
             .then(res => res.json())
             .catch(console.log);
     }
 
-    getPhotos(options) {
+    static getPhotos(options) {
         return this.buildRequest("photos", options);
     }
 
-    getAlbums(options) {
+    static getPhotoUrl(photo, options) {
+        return this.buildURI("photos/"+photo.id+"/file", options);
+    }
+
+    static getAlbums(options) {
         return this.buildRequest("albums", options);
     }
 
-    getDistinctCameras() {
+    static getDistinctCameras() {
         return this.buildRequest("photos/cameras");
     }
 
