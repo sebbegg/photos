@@ -1,3 +1,10 @@
+let apiRoot = "";
+
+function setRoot(root) {
+    console.log("Setting root: " + root);
+    apiRoot = root;
+}
+
 class PhotosAPI {
 
     static buildURI(resource, options) {
@@ -27,17 +34,22 @@ class PhotosAPI {
     }
 
     static getPhotoUrl(photo, options) {
-        return this.buildURI("photos/"+photo.id+"/file", options);
-    }
-
-    static getAlbums(options) {
-        return this.buildRequest("albums", options);
+        return this.buildURI("photos/" + photo.id + "/file", options);
     }
 
     static getDistinctCameras() {
         return this.buildRequest("photos/cameras");
     }
 
+    static getAlbums(options) {
+        return this.buildRequest("albums", options);
+    }
+
+    static getAlbum(name, options) {
+        return this.buildRequest(`albums/${encodeURIComponent(name)}`, options);
+    }
+
 }
 
 export default PhotosAPI;
+export {setRoot};

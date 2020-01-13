@@ -1,76 +1,96 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bulma/css/bulma.css'
 import PhotoBox from './photobox.js'
 import PhotosApi from './PhotosAPI.js'
+import {useLocation} from "react-router-dom";
+
 
 let _ = require("lodash");
 
-class PhotosView extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {photos: [], selection: []};
-        this.handlePhotosLoaded = this.handlePhotosLoaded.bind(this);
-        this.handlePhotoClicked = this.handlePhotoClicked.bind(this);
+function AlbumHeader(props) {
+    if (props.album === null) {
+        return null;
     }
+    const album = props.album;
+    return (
+        <div className="container">
+            <h1 className="title">{(album.name === "_all") ? "Your Photos" : album.name}</h1>
+            <h2 className="subtitle">
+                <p>{`${album.photo_count} Photo` + (album.photo_count === 1 ? "" : "s")}</p>
+                {
+                    (album.photo_count > 0) ? (
+                        <p>{`${album.min_date} - ${album.max_date}`}</p>
+                    ) : (
+                        <p></p>
+                    )
+                }
+            </h2>
+        </div>
+    );
 
-    componentDidMount() {
-        this.loadPhotos();
-    }
+}
 
-    loadPhotos() {
-        PhotosApi.getPhotos(this.props.options)
-            .then(this.handlePhotosLoaded);
-    }
+function PhotosView(props) {
 
-    handlePhotosLoaded(photos) {
-        if (photos === undefined) {
-            photos = [];
-        }
-        this.setState({
-            photos: photos,
-            selection: photos.reduce((a, p) => {
-                a[p.id] = false;
-                return a;
-            }, {})
-        });
-    }
+    const [state, setState] = useState({photos: [], selection: []});
+    const [album, setAlbum] = useState(null);
+    const loc = useLocation();
+    console.log("Rendering photosview for: " + loc.search);
 
-    handlePhotoClicked(photo_id) {
-        let selection = Object.assign({}, this.state.selection);
+    function handlePhotoClicked(photo_id) {
+        let selection = Object.assign({}, state.selection);
         selection[photo_id] = !selection[photo_id];
-        this.setState({selection: selection});
+        console.log("Setting new selection");
+        setState({selection: selection});
     }
 
-    componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
-        if (!_.isEqual(this.props.options, prevProps.options)) {
-            this.loadPhotos();
+    useEffect(() => {
+        let options = {};
+        if (album !== null && album.name !== "_all") {
+            options.album = album.name;
         }
-    }
+        PhotosApi.getPhotos(options).then((photos) => {
+            if (photos === undefined) {
+                photos = [];
+            }
+            setState({
+                photos: photos,
+                selection: photos.reduce((a, p) => {
+                    a[p.id] = false;
+                    return a;
+                }, {})
+            });
+        })
+    }, [album]);
 
-    render() {
+    useEffect(() => {
+        let album = (new URLSearchParams(loc.search)).get("album");
+        PhotosApi.getAlbum(album || "_all").then(setAlbum);
+    }, [loc]);
 
-        return (
-            <div>
-                <div className="columns is-multiline is-vcentered">
-                    {
-                        this.state.photos.map(
-                            (photo) => (
-                                <PhotoBox
-                                    key={photo.id}
-                                    photo={photo}
-                                    selected={this.state.selection[photo.id]}
-                                    onClick={() => this.handlePhotoClicked(photo.id)}
-                                />
-                            )
-                        )
-                    }
+    return (
+        <div>
+            <section className="hero is-dark">
+                <div className="hero-body">
+                    <AlbumHeader album={album}/>
                 </div>
+            </section>
+            <div className="columns is-multiline is-vcentered">
+                {
+                    state.photos.map(
+                        (photo) => (
+                            <PhotoBox
+                                key={photo.id}
+                                photo={photo}
+                                selected={state.selection[photo.id]}
+                                onClick={() => handlePhotoClicked(photo.id)}
+                            />
+                        )
+                    )
+                }
             </div>
-        )
-    };
-
+        </div>
+    );
 }
 
 export default PhotosView

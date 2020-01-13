@@ -2,11 +2,13 @@ import io
 import os
 
 import PIL.Image
-from flask import Blueprint, g, abort, send_file, request
+from flask import Blueprint, g, abort, send_file, request, make_response
 from flask_restplus import Api, Resource, reqparse, inputs
+from werkzeug import urls
 
 from photodb.model import Photo, Album
 from .utils import sqla_resource_fields
+from .albums import get_album
 
 photos_blueprint = Blueprint("photos", __name__)
 api = Api(photos_blueprint)
@@ -137,3 +139,44 @@ class PhotosList(Resource):
 class PhotoStats(Resource):
     def get(self):
         return [row.camera for row in g.session.query(Photo.camera).distinct()]
+
+
+@ns.route("/<int:photo_id>/album/<string:album_name_or_id>")
+class Photos2Albums(Resource):
+
+    @staticmethod
+    def get_photo(photo_id: int) -> Photo:
+
+        photo = g.session.query(Photo).get(photo_id)
+        if photo is None:
+            abort(404, "Photo with id %r not found" % photo_id)
+
+        return photo
+
+    @staticmethod
+    def get_album(album_name_or_id) -> Album:
+
+        album = get_album(g.session, urls.url_unquote(album_name_or_id))
+        if album is None:
+            abort(404, "Album %r not found" % album_name_or_id)
+
+    def post(self, photo_id, album_name_or_id):
+
+        photo = self.get_photo(photo_id)
+        album = self.get_album(album_name_or_id)
+
+        if album not in photo.albums:
+            photo.albums.add(album)
+            return make_response("", 201)
+
+        return make_response("", 200)
+
+    def delete(self, photo_id, album_name_or_id):
+
+        photo = self.get_photo(photo_id)
+        album = self.get_album(album_name_or_id)
+
+        if album in photo.albums:
+            photo.albums.remove(album)
+
+        return make_response("", 200)

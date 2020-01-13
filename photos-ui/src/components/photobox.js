@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './photos.css'
+import '../css/photos.css'
 import PhotosAPI from "./PhotosAPI";
 
 const dateOpts = {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'};

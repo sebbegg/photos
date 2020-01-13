@@ -43,7 +43,7 @@ class Toolbar extends Component {
                     <div className="level-item">
                         <Dropdown
                             items={cameras}
-                            icon="fas fa fa-camera-retro"
+                            icon="fas fa-camera-retro"
                             noSelectionText="All cameras"
                             onSelectionChanged={(selection) => this.handleDropdownChanged("camera", selection)}/>
                     </div>
