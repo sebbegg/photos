@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Dropdown from './dropdown.js';
 import PhotosAPI from "./PhotosAPI";
+
 let _ = require('lodash');
 
 class Toolbar extends Component {

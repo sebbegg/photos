@@ -1,6 +1,5 @@
-import React, {Component} from 'react';
+import React from 'react';
 import 'bulma/css/bulma.css'
-import Toolbar from './toolbar.js'
 import PhotosView from "./photosview";
 import {useLocation} from "react-router-dom"
 
