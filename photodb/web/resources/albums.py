@@ -65,6 +65,7 @@ class Albums(Resource):
 
 @ns.route("")
 class AlbumList(Resource):
+    
     @ns.marshal_with(album_model)
     def get(self):
         return g.session.query(Album).all()

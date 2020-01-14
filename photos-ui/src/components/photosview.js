@@ -49,6 +49,9 @@ function PhotosView(props) {
         if (album !== null && album.name !== "_all") {
             options.album = album.name;
         }
+        if (props.camera !== null && props.camera !== undefined) {
+            options.camera = props.camera;
+        }
         PhotosApi.getPhotos(options).then((photos) => {
             if (photos === undefined) {
                 photos = [];
@@ -60,12 +63,11 @@ function PhotosView(props) {
                     return a;
                 }, {})
             });
-        })
+        });
     }, [album]);
 
     useEffect(() => {
-        let album = (new URLSearchParams(loc.search)).get("album");
-        PhotosApi.getAlbum(album || "_all").then(setAlbum);
+        PhotosApi.getAlbum(props.albumName || "_all").then(setAlbum);
     }, [loc]);
 
     return (

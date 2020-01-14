@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import 'bulma/css/bulma.css'
 import PhotosAPI from "./PhotosAPI";
+import {useLocation} from "react-router-dom";
+import {getPhotosOpts} from "./utils";
 
 const SlideShowButton = (props) => {
     return (
@@ -31,7 +33,7 @@ function SlideShow(props) {
     useEffect(() => {
         toggleFullHeight();
         return toggleFullHeight;
-    });
+    }, []);
 
 
     const incrementCurrent = (increment) => {
@@ -49,9 +51,10 @@ function SlideShow(props) {
 
     const [photos, setPhotos] = useState([]);
     const [current, setCurrent] = useState(0);
+    const location = useLocation();
 
     useEffect(() => {
-        PhotosAPI.getPhotos().then((result) => {
+        PhotosAPI.getPhotos(getPhotosOpts(location)).then((result) => {
             if (result === undefined) {
                 result = [];
             }

@@ -1,28 +1,38 @@
 import React, {useEffect, useState} from 'react';
 import PhotosAPI from "./PhotosAPI";
 import {Link, useLocation} from "react-router-dom";
+import {withQueryParam} from "./utils";
+
+function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp="name") {
+    const params = new URLSearchParams(location.search);
+    return objects.map(o => {
+        return <Link className={"navbar-item " + (o[queryProp] === params.get(queryParam) ? "is-active" : "")}
+                     key={o[queryProp]}
+                     to={loc => withQueryParam(loc, {[queryParam]: o[queryProp]})}>{o[displayProp]}</Link>;
+    });
+}
 
 function Navbar(props) {
 
-    function setAlbumFilter() {
-
-    }
-
     const [albums, setAlbums] = useState([]);
-    const params = new URLSearchParams(useLocation().search);
+    const [cameras, setCameras] = useState([]);
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
 
-    const albumElems = albums.map(a => {
-        return <Link className={"navbar-item " + (a.name === params.get("album") ? "is-active" : "")} key={a.id}
-                     to={loc => `${loc.pathname}?album=${encodeURIComponent(a.name)}`}>{a.name}</Link>;
-    });
+    const albumElems = makeNavbarElems(location, albums, "album");
+    const cameraElems = makeNavbarElems(location, cameras, "camera");
 
     useEffect(() => PhotosAPI.getAlbums().then(setAlbums), []);
+    useEffect(() => PhotosAPI.getDistinctCameras().then(setCameras), []);
+
 
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
-                <a className="navbar-item" href="https://bulma.io">
-                    <img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>
+                <a className="navbar-item" href="#">
+                    {/*<img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>*/}
+                    <p>Einfach</p>
+                    <p>Fotos</p>
                 </a>
 
                 <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false"
@@ -35,12 +45,6 @@ function Navbar(props) {
 
             <div id="navbarBasicExample" className="navbar-menu">
                 <div className="navbar-start">
-                    <a className="navbar-item">
-                        Home
-                    </a>
-                    <a className="navbar-item">
-                        Documentation
-                    </a>
                     <div className="navbar-item has-dropdown is-hoverable">
                         <a className="navbar-link">
                             Albums
@@ -49,7 +53,7 @@ function Navbar(props) {
                             {albumElems}
                             <hr className="navbar-divider"/>
                             <Link className={"navbar-item" + (params.get("album") ? "" : " is-active")}
-                                  to={loc => `${loc.pathname}`}>
+                                  to={loc => withQueryParam(loc, {album: null})}>
                                 All
                             </Link>
                             <a className="navbar-item">
@@ -57,6 +61,22 @@ function Navbar(props) {
                             </a>
                         </div>
                     </div>
+                    <div className="navbar-item has-dropdown is-hoverable">
+                        <a className="navbar-link">
+                            Cameras
+                        </a>
+                        <div className="navbar-dropdown">
+                            {cameraElems}
+                            <hr className="navbar-divider"/>
+                            <Link className={"navbar-item" + (params.get("camera") ? "" : " is-active")}
+                                  to={loc => withQueryParam(loc, {camera: null})}>
+                                All
+                            </Link>
+                        </div>
+                    </div>
+                    <Link className="navbar-item" to={(loc) => `/ui/slideshow${loc.search}`}>
+                        Slideshow
+                    </Link>
                 </div>
 
                 <div className="navbar-end">
