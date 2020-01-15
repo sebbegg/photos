@@ -37,6 +37,10 @@ class PhotosAPI {
         return this.buildURI("photos/" + photo.id + "/file", options);
     }
 
+    static getPhotoDownloadUrl(photo, options) {
+        return this.buildURI("photos/" + photo.id + "/file", {download: "true"});
+    }
+
     static getDistinctCameras() {
         return this.buildRequest("photos/cameras");
     }

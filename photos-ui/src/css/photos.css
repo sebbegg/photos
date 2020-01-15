@@ -94,7 +94,7 @@
 }
 
 /* button */
-.is-icon {
+.is-icon, .is-icon:hover {
     background-color: transparent;
     border: none;
 }

@@ -3,8 +3,22 @@ import '../css/photos.css'
 import PhotosAPI from "./PhotosAPI";
 
 const dateOpts = {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'};
+
 function niceDate(datestr) {
     return (new Date(datestr).toLocaleDateString(undefined, dateOpts));
+}
+
+function IconButton(props) {
+    const iElem = (<i className={"fas " + props.icon}/>);
+    if (props.href !== undefined) {
+        return (<a className="button has-text-white is-icon" href={props.href}>
+            {iElem}
+        </a>);
+    } else {
+        return (<button className="button has-text-white is-icon">
+            {iElem}
+        </button>);
+    }
 }
 
 function PhotoBox(props) {
@@ -33,8 +47,9 @@ function PhotoBox(props) {
 
                         <span className="has-text-white icon is-medium is-pulled-right"
                               style={{justifyContent: "flex-end"}}>
-                            <i className="fas fa-folder" style={{margin: "0em 0.5em"}}/>
-                            <i className="fas fa-arrow-alt-circle-down" style={{margin: "0em 0.5em"}}/>
+                            <IconButton icon="fa-folder"/>
+                            <IconButton icon="fa-arrow-alt-circle-down" href={PhotosAPI.getPhotoDownloadUrl(props.photo)}/>
+                            <IconButton icon="fa-info-circle"/>
                         </span>
                     </div>
                 </div>

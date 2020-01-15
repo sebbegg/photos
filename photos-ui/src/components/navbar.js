@@ -22,8 +22,8 @@ function Navbar(props) {
     const albumElems = makeNavbarElems(location, albums, "album");
     const cameraElems = makeNavbarElems(location, cameras, "camera");
 
-    useEffect(() => PhotosAPI.getAlbums().then(setAlbums), []);
-    useEffect(() => PhotosAPI.getDistinctCameras().then(setCameras), []);
+    useEffect(() => {PhotosAPI.getAlbums().then(setAlbums);}, []);
+    useEffect(() => {PhotosAPI.getDistinctCameras().then(setCameras);}, []);
 
 
     return (

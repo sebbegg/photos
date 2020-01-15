@@ -1,13 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import 'bulma/css/bulma.css'
 import PhotosAPI from "./PhotosAPI";
-import {useLocation} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {getPhotosOpts} from "./utils";
+
+import _ from "lodash";
+
+const ICON_CLASS = "icon is-large has-text-grey-lighter";
 
 const SlideShowButton = (props) => {
     return (
         <button className="button slideshow-button" onClick={props.onClick}>
-            <span className="icon is-large has-text-grey">
+            <span className={ICON_CLASS}>
                 <i className={`fas fa-caret-square-${props.dir} fa-3x`}/>
             </span>
         </button>
@@ -31,6 +35,7 @@ const toggleFullScreen = () => {
 function SlideShow(props) {
 
     useEffect(() => {
+        console.log("Toggling full-height")
         toggleFullHeight();
         return toggleFullHeight;
     }, []);
@@ -56,11 +61,11 @@ function SlideShow(props) {
     useEffect(() => {
         PhotosAPI.getPhotos(getPhotosOpts(location)).then((result) => {
             if (result === undefined) {
-                result = [];
+                result = {photos: []};
             }
-            setPhotos(result);
+            setPhotos(result.photos);
         });
-    }, []);
+    }, [location]);
 
     const photo = photos[current];
     if (photos.length === 0) {
@@ -71,8 +76,15 @@ function SlideShow(props) {
         <div id="slideshow" className="full-page-background has-background-black" style={{backgroundImage: photoUrl}}>
             <nav className="level fading" style={{position: "fixed", left: "12%", right: "12%", padding: "0.5em"}}>
                 <div className="level-item has-text-centered">
+                    <Link className="button is-medium is-icon" to={loc => _.set(loc, "pathname", "/ui/gallery")}>
+                        <span className={ICON_CLASS}>
+                            <i className="fas fa-home fa-2x"/>
+                        </span>
+                    </Link>
+                </div>
+                <div className="level-item has-text-centered">
                     <button className="button is-medium is-icon" onClick={toggleFullScreen}>
-                        <span className="icon is-large has-text-grey">
+                        <span className={ICON_CLASS}>
                             <i className="fas fa-expand fa-2x"/>
                         </span>
                     </button>

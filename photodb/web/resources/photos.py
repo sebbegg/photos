@@ -3,12 +3,13 @@ import os
 
 import PIL.Image
 from flask import Blueprint, g, abort, send_file, request, make_response
-from flask_restplus import Api, Resource, reqparse, inputs
+from flask_restplus import Api, Resource, reqparse, inputs, fields
+from sqlalchemy.sql import func
 from werkzeug import urls
 
 from photodb.model import Photo, Album
-from .utils import sqla_resource_fields
 from .albums import get_album
+from .utils import sqla_resource_fields
 
 photos_blueprint = Blueprint("photos", __name__)
 api = Api(photos_blueprint)
@@ -19,6 +20,15 @@ del photos_fields["thumbnail_data"]
 del photos_fields["exif"]
 
 photo_model = ns.model("photo", photos_fields)
+photo_search = ns.model(
+    "searchresult",
+    {
+        "page": fields.Integer,
+        "page_size": fields.Integer,
+        "photos": fields.List(fields.Nested(photo_model)),
+        "photos_count": fields.Integer,
+    },
+)
 
 
 @ns.route("/<int:id>")
@@ -35,7 +45,6 @@ _exif_orient_2_rotate = {3: 180, 5: 270, 6: -90, 7: 90, 8: 270}
 
 
 def normalize_exif_orientation(image: PIL.Image.Image, orientation: int):
-
     if orientation in (2, 5, 7):
         image = image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 
@@ -51,13 +60,10 @@ class PhotoFiles(Resource):
 
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "size", type=int, default=500, help="Crop image to be at most this many pixels high or wide",
+        "size", type=inputs.int_range(0, 1_000_000), default=500, help="Crop image to be at most this many pixels high or wide",
     )
     parser.add_argument(
         "download", type=inputs.boolean, default=False, help="If 'true', return image as attachment",
-    )
-    parser.add_argument(
-        "unmodified", type=inputs.int_range(0, 100000), default=False, help="If true, return unmodified original image",
     )
 
     @classmethod
@@ -79,7 +85,7 @@ class PhotoFiles(Resource):
         file_to_send = os.path.join(photo.path, photo.filename)
 
         args = self.parser.parse_args()
-        if not args.unmodified:
+        if not args.download:
             image = PIL.Image.open(file_to_send)
             assert isinstance(image, PIL.Image.Image)
 
@@ -116,7 +122,7 @@ class PhotosList(Resource):
         "max_date", type=inputs.datetime_from_iso8601, default=None, help="Restrict to photos captured before max_date"
     )
 
-    @api.marshal_with(photo_model)
+    @api.marshal_with(photo_search)
     def get(self):
         args = self.parser.parse_args()
         offset = (args.page - 1) * args.pagesize
@@ -131,8 +137,16 @@ class PhotosList(Resource):
         if args.camera:
             query = query.filter(Photo.camera == args.camera)
 
-        query = query.order_by(Photo.capture_date.desc()).offset(offset).limit(args.pagesize)
-        return query.all()
+        count_query = g.session.query(func.count(Photo.id))
+        if query.whereclause is not None:
+            count_query = count_query.filter(query.whereclause)
+
+        return {
+            "page": args.page,
+            "page_size": args.pagesize,
+            "photos_count": count_query.scalar(),
+            "photos": query.order_by(Photo.capture_date.desc())[offset:offset + args.pagesize],
+        }
 
 
 @ns.route("/cameras")
