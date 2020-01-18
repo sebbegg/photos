@@ -4,6 +4,7 @@ import PhotoBox from './photobox.js'
 import PhotosApi from './PhotosAPI.js'
 
 import _ from "lodash";
+import {prettyDateRange} from "./utils";
 
 function AlbumHeader(props) {
     if (props.album === null) {
@@ -12,6 +13,7 @@ function AlbumHeader(props) {
     const album = props.album;
     const selectedCount = props.count !== album.photo_count ? ` (${props.count} selected)` : "";
     const plural = album.photo_count === 1 ? "" : "s";
+    const [minDateString, maxDateString] = prettyDateRange(album.min_date, album.max_date);
 
     return (
         <div className="container">
@@ -20,7 +22,7 @@ function AlbumHeader(props) {
                 <p>{`${album.photo_count} Photo${plural}${selectedCount}`}</p>
                 {
                     (album.photo_count > 0) ? (
-                        <p>{`${album.min_date} - ${album.max_date}`}</p>
+                        <p>{`${minDateString} - ${maxDateString}`}</p>
                     ) : (
                         <p></p>
                     )
@@ -51,9 +53,11 @@ function PhotosView(props) {
         if (album !== null && album.name !== "_all") {
             options.album = album.name;
         }
-        if (props.camera !== null && props.camera !== undefined) {
-            options.camera = props.camera;
-        }
+        ["camera", "min_date", "max_date"].forEach(k => {
+            if (props[k] !== null && props[k] !== undefined) {
+                options[k] = props[k];
+            }
+        });
         PhotosApi.getPhotos(options).then((result) => {
             if (result === undefined) {
                 return;
@@ -69,7 +73,7 @@ function PhotosView(props) {
                 }, {})
             });
         });
-    }, [album, props.camera]);
+    }, [album, props]);
 
 
     return (
@@ -79,6 +83,7 @@ function PhotosView(props) {
                     <AlbumHeader album={album} count={state.photos_count}/>
                 </div>
             </section>
+            <div className="container">
             <div className="columns is-multiline is-vcentered">
                 {
                     state.photos.map(
@@ -93,6 +98,7 @@ function PhotosView(props) {
                     )
                 }
             </div>
+                </div>
         </div>
     );
 }

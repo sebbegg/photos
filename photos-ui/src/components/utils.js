@@ -1,3 +1,5 @@
+import moment from "moment";
+
 function getParams() {
 
 }
@@ -27,4 +29,19 @@ function getPhotosOpts(location) {
     return options;
 }
 
-export {withQueryParam, getPhotosOpts};
+function prettyDateRange(minDate, maxDate, fmt="LL") {
+    if (!maxDate || !minDate) {
+        return [undefined, undefined]
+    }
+
+    const a = moment(minDate);
+    const b = moment(maxDate);
+
+    if (b.isSame(moment(), "day")) {
+        return [a.fromNow(), "Today"];
+    } else {
+        return [a.format(fmt), b.format(fmt)];
+    }
+}
+
+export {withQueryParam, getPhotosOpts, prettyDateRange};

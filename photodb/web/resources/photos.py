@@ -137,6 +137,12 @@ class PhotosList(Resource):
         if args.camera:
             query = query.filter(Photo.camera == args.camera)
 
+        import datetime
+        if args.min_date and args.max_date:
+            args.max_date += datetime.timedelta(days=1) - datetime.timedelta(microseconds=1)
+            query = query.filter(Photo.capture_date.between(args.min_date, args.max_date))
+            print(f"Date range: {args.min_date} - {args.max_date}")
+
         count_query = g.session.query(func.count(Photo.id))
         if query.whereclause is not None:
             count_query = count_query.filter(query.whereclause)

@@ -10,7 +10,8 @@ function Gallery(props) {
 
     return (
         <div>
-            <PhotosView albumName={p.get("album")} camera={p.get("camera")}/>
+            <PhotosView albumName={p.get("album")} camera={p.get("camera")}
+            min_date={p.get("minDate")} max_date={p.get("maxDate")}/>
         </div>
     )
 

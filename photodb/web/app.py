@@ -2,8 +2,9 @@ from flask import Flask, g, current_app
 from flask_cors import CORS
 
 from sqlalchemy import create_engine
+import sqlalchemy.exc as sa_exc
 from .resources import all_blueprints
-from photodb.model import Db
+from photodb.model import Db, SourceFolder
 
 from sqlalchemy.orm import sessionmaker
 
@@ -35,9 +36,18 @@ def create_app():
     app.before_request(new_session)
     app.after_request(close_session)
 
-    app.config.from_mapping(SCAN_FOLDERS=["/Users/sebastianeckweiler/PycharmProjects/photodb/data"])
-
-    engine = create_engine("sqlite:///photosdb.sqlite")
+    engine = create_engine("sqlite:///photosdb.sqlite", echo=True)
     app.sessionfactory = sessionmaker(engine)
+
     Db.metadata.create_all(engine)
+    session = app.sessionfactory()
+    session.add(SourceFolder(folder="/Users/sebastianeckweiler/PycharmProjects/photodb/data"))
+    try:
+        session.commit()
+    except sa_exc.IntegrityError:
+        session.rollback()
+        pass
+    finally:
+        session.close()
+
     return app

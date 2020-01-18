@@ -1,6 +1,7 @@
 import base64
 import mimetypes
 import os
+import datetime
 import pathlib
 
 import attr
@@ -34,31 +35,57 @@ def _exifread(path: str) -> dict:
 class ImageScanner:
 
     dirname = attr.ib()
-    skip_dirs_modified_before = attr.ib(factory=dict)
-    dirs_modified_times = attr.ib(factory=dict)
-
-    def _key_for_direntry(self, entry: os.DirEntry):
-        return str(pathlib.Path(entry.path).relative_to(self.dirname))
-
-    def _skip_dir(self, entry: os.DirEntry):
-
-        key = self._key_for_direntry(entry)
-        stats = entry.stat()
-        self.dirs_modified_times[key] = stats.st_mtime
-
-        return stats.st_mtime <= self.skip_dirs_modified_before.get(key, 0)
+    last_scan_stats = attr.ib(factory=dict)
+    scan_stats = attr.ib(factory=dict)
 
     def __iter__(self):
 
-        self.dirs_modified_times = {}
+        if self.last_scan_stats is None:
+            self.last_scan_stats = {}
+        self.scan_stats = self.last_scan_stats.copy()
+
         yield from self._scan(self.dirname)
+
+    def _key_for_direntry(self, dirname: str):
+        return str(pathlib.Path(dirname).relative_to(self.dirname))
 
     def _scan(self, dirname):
 
+        relative_dir = self._key_for_direntry(dirname)
+        last_scanned = self.last_scan_stats.get(relative_dir, 0)
+        self.scan_stats[relative_dir] = datetime.datetime.now().timestamp()
+
         for entry in os.scandir(dirname):
+            stats = entry.stat()
+            if stats.st_ctime < last_scanned and stats.st_mtime < last_scanned:
+                continue
+
             if entry.is_file():
                 type, enc = mimetypes.guess_type(entry.name)
                 if type and type.startswith("image"):
                     yield entry.path, _exifread(entry.path)
-            elif entry.is_dir() and not self._skip_dir(entry):
+            elif entry.is_dir():
                 yield from self._scan(entry.path)
+
+
+if __name__ == "__main__":
+    import sys
+    import time
+    import json
+
+    last_scan = {}
+    while True:
+        scanner = ImageScanner(sys.argv[1], last_scan_stats=last_scan)
+
+        count = 0
+        for count, (path, exif) in enumerate(scanner):
+            pass
+        print(f"Found {count} images")
+        last_scan = scanner.scan_stats
+
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            break
+
+    print(json.dumps(scanner.scan_stats, indent=4))

@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import PhotosAPI from "./PhotosAPI";
-import {Link, useLocation} from "react-router-dom";
-import {withQueryParam} from "./utils";
+import {Link, useHistory, useLocation} from "react-router-dom";
+import {prettyDateRange, withQueryParam} from "./utils";
+import bulmaCalendar from 'bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js';
+import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css"
 
-function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp="name") {
+function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp = "name") {
     const params = new URLSearchParams(location.search);
     return objects.map(o => {
         return <Link className={"navbar-item " + (o[queryProp] === params.get(queryParam) ? "is-active" : "")}
@@ -16,22 +18,48 @@ function Navbar(props) {
 
     const [albums, setAlbums] = useState([]);
     const [cameras, setCameras] = useState([]);
+    const [calendar, setCalendar] = useState(null);
     const location = useLocation();
     const params = new URLSearchParams(location.search);
 
     const albumElems = makeNavbarElems(location, albums, "album");
     const cameraElems = makeNavbarElems(location, cameras, "camera");
 
-    useEffect(() => {PhotosAPI.getAlbums().then(setAlbums);}, []);
-    useEffect(() => {PhotosAPI.getDistinctCameras().then(setCameras);}, []);
+
+    useEffect(() => {
+        PhotosAPI.getAlbums().then(setAlbums);
+    }, []);
+    useEffect(() => {
+        PhotosAPI.getDistinctCameras().then(setCameras);
+    }, []);
+
+    const history = useHistory();
+
+    // initialize calender
+    useEffect(() => {
+        const calendars = bulmaCalendar.attach('[type="date"]');
+        // Loop on each calendar initialized
+        calendars.forEach(cal => {
+            setCalendar(cal);
+            cal.on('select clear', () => {
+                history.push(withQueryParam(location, {
+                    minDate: cal.startDate && cal.startDate.toISOString().slice(0, 10) ,
+                    maxDate: cal.endDate && cal.endDate.toISOString().slice(0, 10)
+                }))
+            });
+        });
+    }, []);
 
 
+    let minDateStr, maxDateStr = null;
+    if (calendar) {
+        [minDateStr, maxDateStr] = prettyDateRange(calendar.startDate, calendar.endDate);
+    }
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
                 <a className="navbar-item" href="#">
                     {/*<img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>*/}
-                    <p>Einfach</p>
                     <p>Fotos</p>
                 </a>
 
@@ -74,20 +102,33 @@ function Navbar(props) {
                             </Link>
                         </div>
                     </div>
-                    <Link className="navbar-item" to={(loc) => `/ui/slideshow${loc.search}`}>
-                        Slideshow
-                    </Link>
+                    <div className="navbar-item has-dropdown is-hoverable">
+                        <div className="navbar-link">
+                            <a className="icon has-text-grey">
+                                <i className="fas fa-calendar-alt"></i>
+                            </a>
+                            <div className="is-centered">
+                                <div className="has-text-centered is-size-7">{minDateStr}</div>
+                                <div className="has-text-centered is-size-7">{maxDateStr}</div>
+                            </div>
+                        </div>
+                        <div className="navbar-dropdown">
+                            <div className="navbar-item">
+                                <div>
+                                    <input type="date" data-is-range="true" data-color="link"
+                                           data-display-mode="dialog"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="navbar-end">
                     <div className="navbar-item">
                         <div className="buttons">
-                            <a className="button is-primary">
-                                <strong>Button A</strong>
-                            </a>
-                            <a className="button is-light">
-                                Button B
-                            </a>
+                            <Link className="button is-link"  to={(loc) => `/ui/slideshow${loc.search}`}>
+                                <i className="fas fa-tv"></i>
+                            </Link>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 import datetime
 import os
+import json
 import pathlib
 
 from sqlalchemy import Column, String, JSON, DateTime, BigInteger, Integer, Table, ForeignKey, UniqueConstraint
@@ -35,6 +36,23 @@ _photo_to_album = Table(
     Column("photo_id", BigInt, ForeignKey("photos.id"), primary_key=True),
     Column("album_id", BigInt, ForeignKey("albums.id"), primary_key=True),
 )
+
+
+@with_str
+class SourceFolder(Db):
+
+    __tablename__ = "sourcefolders"
+
+    folder: str = Column(String, primary_key=True)
+    _stats: str = Column("stats", String, default=None)
+
+    @property
+    def stats(self):
+        return json.loads(self._stats) if self._stats else None
+
+    @stats.setter
+    def stats(self, value):
+        self._stats = json.dumps(value)
 
 
 @with_str
