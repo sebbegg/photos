@@ -109,7 +109,7 @@ class PhotosList(Resource):
         "page", type=int, default=1, help="Page no. to return",
     )
     parser.add_argument(
-        "pagesize", type=int, default=20, help="Page size",
+        "pagesize", type=int, default=24, help="Page size",
     )
     parser.add_argument(
         "album", type=str, default=None, help="Return photos only from album",

@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import 'bulma/css/bulma.css'
 import PhotoBox from './photobox.js'
 import PhotosApi from './PhotosAPI.js'
+import PagingControl from "./paging";
 
 import _ from "lodash";
 import {prettyDateRange} from "./utils";
@@ -37,6 +38,7 @@ function PhotosView(props) {
 
     const [state, setState] = useState({photos: [], photos_count: 0, page: 1, page_count: 1, selection: []});
     const [album, setAlbum] = useState(null);
+    const [page, setPage] = useState(1);
 
     function handlePhotoClicked(photo_id) {
         let selection = Object.assign({}, state.selection);
@@ -49,7 +51,7 @@ function PhotosView(props) {
     }, [props.albumName]);
 
     useEffect(() => {
-        let options = {};
+        let options = {page: page, pagesize: 24};
         if (album !== null && album.name !== "_all") {
             options.album = album.name;
         }
@@ -73,7 +75,7 @@ function PhotosView(props) {
                 }, {})
             });
         });
-    }, [album, props]);
+    }, [album, props, page]);
 
 
     return (
@@ -84,23 +86,25 @@ function PhotosView(props) {
                 </div>
             </section>
             <div className="container">
-            <div className="columns is-multiline is-vcentered">
-                {
-                    state.photos.map(
-                        (photo) => (
-                            <PhotoBox
-                                key={photo.id}
-                                photo={photo}
-                                selected={state.selection[photo.id]}
-                                onClick={() => handlePhotoClicked(photo.id)}
-                            />
+                <div className="columns is-multiline is-vcentered">
+                    {
+                        state.photos.map(
+                            (photo) => (
+                                <PhotoBox
+                                    key={photo.id}
+                                    photo={photo}
+                                    selected={state.selection[photo.id]}
+                                    onClick={() => handlePhotoClicked(photo.id)}
+                                />
+                            )
                         )
-                    )
-                }
-            </div>
+                    }
                 </div>
+                <PagingControl pageCount={state.page_count} currentPage={state.page}
+                               onClick={(page) => setPage(page)} />
+            </div>
         </div>
-    );
+);
 }
 
 export default PhotosView
