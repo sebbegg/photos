@@ -4,6 +4,7 @@ import {Link, useHistory, useLocation} from "react-router-dom";
 import {prettyDateRange, withQueryParam} from "./utils";
 import bulmaCalendar from 'bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js';
 import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css"
+import {AlbumCreator} from "./modals";
 
 function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp = "name") {
     const params = new URLSearchParams(location.search);
@@ -24,6 +25,14 @@ function Navbar(props) {
 
     const albumElems = makeNavbarElems(location, albums, "album");
     const cameraElems = makeNavbarElems(location, cameras, "camera");
+
+    const [albumCreatorActive, setAlbumCreatorActive] = useState(false);
+    const closeAlbumCreator = () => {
+        console.log("Closing album creator in navbar");
+        setAlbumCreatorActive(false);
+    };
+    console.log("Rendering navbar with albumcreator: " + albumCreatorActive);
+
 
 
     useEffect(() => {
@@ -57,6 +66,7 @@ function Navbar(props) {
     }
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
+            <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator}/>
             <div className="navbar-brand">
                 <a className="navbar-item" href="#">
                     {/*<img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>*/}
@@ -84,7 +94,7 @@ function Navbar(props) {
                                   to={loc => withQueryParam(loc, {album: null})}>
                                 All
                             </Link>
-                            <a className="navbar-item">
+                            <a className="navbar-item" onClick={() => setAlbumCreatorActive(true)}>
                                 New Album…
                             </a>
                         </div>

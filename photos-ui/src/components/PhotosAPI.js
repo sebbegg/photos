@@ -8,7 +8,7 @@ function setRoot(root) {
 class PhotosAPI {
 
     static buildURI(resource, options) {
-        let uri = "http://192.168.1.10:5000/";
+        let uri = "http://localhost:5000/";
 
         uri = uri + resource;
 
@@ -51,6 +51,17 @@ class PhotosAPI {
 
     static getAlbum(name, options) {
         return this.buildRequest(`albums/${encodeURIComponent(name)}`, options);
+    }
+
+    static createAlbum(name, description="") {
+        const uri = this.buildURI("albums");
+        return fetch(uri, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({name: name, description: description})
+        });
     }
 
 }
