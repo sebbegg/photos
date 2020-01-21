@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import 'bulma/css/bulma.css'
-import PhotoBox from './photobox.js'
-import PhotosApi from './PhotosAPI.js'
+import React, { useEffect, useState } from "react";
+import "bulma/css/bulma.css";
+import PhotoBox from "./photobox.js";
+import PhotosApi from "./PhotosAPI.js";
 import PagingControl from "./paging";
 
 import _ from "lodash";
-import {prettyDateRange} from "./utils";
+import { prettyDateRange } from "./utils";
 
 function AlbumHeader(props) {
     if (props.album === null) {
@@ -18,32 +18,30 @@ function AlbumHeader(props) {
 
     return (
         <div className="container">
-            <h1 className="title">{(album.name === "_all") ? "Your Photos" : album.name}</h1>
+            <h1 className="title">{album.name === "_all" ? "Your Photos" : album.name}</h1>
             <h2 className="subtitle">
                 <p>{`${album.photo_count} Photo${plural}${selectedCount}`}</p>
-                {
-                    (album.photo_count > 0) ? (
-                        <p>{`${minDateString} - ${maxDateString}`}</p>
-                    ) : (
-                        <p></p>
-                    )
-                }
+                {album.photo_count > 0 ? <p>{`${minDateString} - ${maxDateString}`}</p> : <p></p>}
             </h2>
         </div>
     );
-
 }
 
 function PhotosView(props) {
-
-    const [state, setState] = useState({photos: [], photos_count: 0, page: 1, page_count: 1, selection: []});
+    const [state, setState] = useState({
+        photos: [],
+        photos_count: 0,
+        page: 1,
+        page_count: 1,
+        selection: []
+    });
     const [album, setAlbum] = useState(null);
     const [page, setPage] = useState(1);
 
     function handlePhotoClicked(photo_id) {
         let selection = Object.assign({}, state.selection);
         selection[photo_id] = !selection[photo_id];
-        setState((state) => _.set(state, "selection", selection));
+        setState(state => _.set(state, "selection", selection));
     }
 
     useEffect(() => {
@@ -51,7 +49,7 @@ function PhotosView(props) {
     }, [props.albumName]);
 
     useEffect(() => {
-        let options = {page: page, pagesize: 24};
+        let options = { page: page, pagesize: 24 };
         if (album !== null && album.name !== "_all") {
             options.album = album.name;
         }
@@ -60,7 +58,7 @@ function PhotosView(props) {
                 options[k] = props[k];
             }
         });
-        PhotosApi.getPhotos(options).then((result) => {
+        PhotosApi.getPhotos(options).then(result => {
             if (result === undefined) {
                 return;
             }
@@ -77,34 +75,32 @@ function PhotosView(props) {
         });
     }, [album, props, page]);
 
-
     return (
         <div>
             <section className="hero is-dark">
                 <div className="hero-body">
-                    <AlbumHeader album={album} count={state.photos_count}/>
+                    <AlbumHeader album={album} count={state.photos_count} />
                 </div>
             </section>
             <div className="container">
                 <div className="columns is-multiline is-vcentered">
-                    {
-                        state.photos.map(
-                            (photo) => (
-                                <PhotoBox
-                                    key={photo.id}
-                                    photo={photo}
-                                    selected={state.selection[photo.id]}
-                                    onClick={() => handlePhotoClicked(photo.id)}
-                                />
-                            )
-                        )
-                    }
+                    {state.photos.map(photo => (
+                        <PhotoBox
+                            key={photo.id}
+                            photo={photo}
+                            selected={state.selection[photo.id]}
+                            onClick={() => handlePhotoClicked(photo.id)}
+                        />
+                    ))}
                 </div>
-                <PagingControl pageCount={state.page_count} currentPage={state.page}
-                               onClick={(page) => setPage(page)} />
+                <PagingControl
+                    pageCount={state.page_count}
+                    currentPage={state.page}
+                    onClick={page => setPage(page)}
+                />
             </div>
         </div>
-);
+    );
 }
 
-export default PhotosView
+export default PhotosView;

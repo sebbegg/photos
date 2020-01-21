@@ -1,8 +1,6 @@
 import moment from "moment";
 
-function getParams() {
-
-}
+function getParams() {}
 
 function withQueryParam(location, params) {
     let current = new URLSearchParams(location.search);
@@ -13,13 +11,13 @@ function withQueryParam(location, params) {
             current.set(key, value);
         }
     });
-    return `${location.pathname}?${current.toString()}`
+    return `${location.pathname}?${current.toString()}`;
 }
 
 function getPhotosOpts(location) {
     let p = new URLSearchParams(location.search);
     let options = {};
-    ["album", "camera"].map((key) => {
+    ["album", "camera"].map(key => {
         let val = p.get(key);
         if (val !== undefined && val !== null) {
             options[key] = val;
@@ -29,9 +27,9 @@ function getPhotosOpts(location) {
     return options;
 }
 
-function prettyDateRange(minDate, maxDate, fmt="LL") {
+function prettyDateRange(minDate, maxDate, fmt = "LL") {
     if (!maxDate || !minDate) {
-        return [undefined, undefined]
+        return [undefined, undefined];
     }
 
     const a = moment(minDate);
@@ -44,4 +42,4 @@ function prettyDateRange(minDate, maxDate, fmt="LL") {
     }
 }
 
-export {withQueryParam, getPhotosOpts, prettyDateRange};
+export { withQueryParam, getPhotosOpts, prettyDateRange };

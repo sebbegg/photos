@@ -1,22 +1,29 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import PhotosAPI from "./PhotosAPI";
-import {Link, useHistory, useLocation} from "react-router-dom";
-import {prettyDateRange, withQueryParam} from "./utils";
-import bulmaCalendar from 'bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js';
-import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css"
-import {AlbumCreator} from "./modals";
+import { Link, useHistory, useLocation } from "react-router-dom";
+import { prettyDateRange, withQueryParam } from "./utils";
+import bulmaCalendar from "bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js";
+import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css";
+import { AlbumCreator } from "./modals";
 
 function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp = "name") {
     const params = new URLSearchParams(location.search);
     return objects.map(o => {
-        return <Link className={"navbar-item " + (o[queryProp] === params.get(queryParam) ? "is-active" : "")}
-                     key={o[queryProp]}
-                     to={loc => withQueryParam(loc, {[queryParam]: o[queryProp]})}>{o[displayProp]}</Link>;
+        return (
+            <Link
+                className={
+                    "navbar-item " + (o[queryProp] === params.get(queryParam) ? "is-active" : "")
+                }
+                key={o[queryProp]}
+                to={loc => withQueryParam(loc, { [queryParam]: o[queryProp] })}
+            >
+                {o[displayProp]}
+            </Link>
+        );
     });
 }
 
 function Navbar(props) {
-
     const [albums, setAlbums] = useState([]);
     const [cameras, setCameras] = useState([]);
     const [calendar, setCalendar] = useState(null);
@@ -33,8 +40,6 @@ function Navbar(props) {
     };
     console.log("Rendering navbar with albumcreator: " + albumCreatorActive);
 
-
-
     useEffect(() => {
         PhotosAPI.getAlbums().then(setAlbums);
     }, []);
@@ -50,48 +55,57 @@ function Navbar(props) {
         // Loop on each calendar initialized
         calendars.forEach(cal => {
             setCalendar(cal);
-            cal.on('select clear', () => {
-                history.push(withQueryParam(location, {
-                    minDate: cal.startDate && cal.startDate.toISOString().slice(0, 10) ,
-                    maxDate: cal.endDate && cal.endDate.toISOString().slice(0, 10)
-                }))
+            cal.on("select clear", () => {
+                history.push(
+                    withQueryParam(location, {
+                        minDate: cal.startDate && cal.startDate.toISOString().slice(0, 10),
+                        maxDate: cal.endDate && cal.endDate.toISOString().slice(0, 10)
+                    })
+                );
             });
         });
     }, []);
 
-
-    let minDateStr, maxDateStr = null;
+    let minDateStr,
+        maxDateStr = null;
     if (calendar) {
         [minDateStr, maxDateStr] = prettyDateRange(calendar.startDate, calendar.endDate);
     }
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
-            <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator}/>
+            <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator} />
             <div className="navbar-brand">
                 <a className="navbar-item" href="#">
                     {/*<img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>*/}
                     <p>Fotos</p>
                 </a>
 
-                <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false"
-                   data-target="navbarBasicExample">
-                    <span aria-hidden="true"/>
-                    <span aria-hidden="true"/>
-                    <span aria-hidden="true"/>
+                <a
+                    role="button"
+                    className="navbar-burger burger"
+                    aria-label="menu"
+                    aria-expanded="false"
+                    data-target="navbarBasicExample"
+                >
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
                 </a>
             </div>
 
             <div id="navbarBasicExample" className="navbar-menu">
                 <div className="navbar-start">
                     <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">
-                            Albums
-                        </a>
+                        <a className="navbar-link">Albums</a>
                         <div className="navbar-dropdown">
                             {albumElems}
-                            <hr className="navbar-divider"/>
-                            <Link className={"navbar-item" + (params.get("album") ? "" : " is-active")}
-                                  to={loc => withQueryParam(loc, {album: null})}>
+                            <hr className="navbar-divider" />
+                            <Link
+                                className={
+                                    "navbar-item" + (params.get("album") ? "" : " is-active")
+                                }
+                                to={loc => withQueryParam(loc, { album: null })}
+                            >
                                 All
                             </Link>
                             <a className="navbar-item" onClick={() => setAlbumCreatorActive(true)}>
@@ -100,14 +114,16 @@ function Navbar(props) {
                         </div>
                     </div>
                     <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">
-                            Cameras
-                        </a>
+                        <a className="navbar-link">Cameras</a>
                         <div className="navbar-dropdown">
                             {cameraElems}
-                            <hr className="navbar-divider"/>
-                            <Link className={"navbar-item" + (params.get("camera") ? "" : " is-active")}
-                                  to={loc => withQueryParam(loc, {camera: null})}>
+                            <hr className="navbar-divider" />
+                            <Link
+                                className={
+                                    "navbar-item" + (params.get("camera") ? "" : " is-active")
+                                }
+                                to={loc => withQueryParam(loc, { camera: null })}
+                            >
                                 All
                             </Link>
                         </div>
@@ -125,8 +141,12 @@ function Navbar(props) {
                         <div className="navbar-dropdown">
                             <div className="navbar-item">
                                 <div>
-                                    <input type="date" data-is-range="true" data-color="link"
-                                           data-display-mode="dialog"/>
+                                    <input
+                                        type="date"
+                                        data-is-range="true"
+                                        data-color="link"
+                                        data-display-mode="dialog"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -136,7 +156,10 @@ function Navbar(props) {
                 <div className="navbar-end">
                     <div className="navbar-item">
                         <div className="buttons">
-                            <Link className="button is-link"  to={(loc) => `/ui/slideshow${loc.search}`}>
+                            <Link
+                                className="button is-link"
+                                to={loc => `/ui/slideshow${loc.search}`}
+                            >
                                 <i className="fas fa-tv"></i>
                             </Link>
                         </div>

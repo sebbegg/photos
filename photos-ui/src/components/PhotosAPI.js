@@ -6,7 +6,6 @@ function setRoot(root) {
 }
 
 class PhotosAPI {
-
     static buildURI(resource, options) {
         let uri = "http://localhost:5000/";
 
@@ -38,7 +37,7 @@ class PhotosAPI {
     }
 
     static getPhotoDownloadUrl(photo, options) {
-        return this.buildURI("photos/" + photo.id + "/file", {download: "true"});
+        return this.buildURI("photos/" + photo.id + "/file", { download: "true" });
     }
 
     static getDistinctCameras() {
@@ -53,18 +52,17 @@ class PhotosAPI {
         return this.buildRequest(`albums/${encodeURIComponent(name)}`, options);
     }
 
-    static createAlbum(name, description="") {
+    static createAlbum(name, description = "") {
         const uri = this.buildURI("albums");
         return fetch(uri, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify({name: name, description: description})
+            body: JSON.stringify({ name: name, description: description })
         });
     }
-
 }
 
 export default PhotosAPI;
-export {setRoot};
+export { setRoot };
