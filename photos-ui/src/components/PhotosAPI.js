@@ -22,14 +22,35 @@ class PhotosAPI {
         return uri;
     }
 
-    static buildRequest(resource, options) {
+    static doGet(resource, options) {
         return fetch(this.buildURI(resource, options))
             .then(res => res.json())
             .catch(console.log);
     }
 
+    static doDelete(resource, options) {
+        return fetch(this.buildURI(resource, options), { method: "DELETE" })
+            .then(res => res.json())
+            .catch(console.log);
+    }
+
+    static doPost(resource, data, options) {
+        let init = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+        if (data !== undefined) {
+            init.body = JSON.stringify(data);
+        }
+        return fetch(this.buildURI(resource, options), init)
+            .then(res => res.json())
+            .catch(console.log);
+    }
+
     static getPhotos(options) {
-        return this.buildRequest("photos", options);
+        return this.doGet("photos", options);
     }
 
     static getPhotoUrl(photo, options) {
@@ -41,15 +62,27 @@ class PhotosAPI {
     }
 
     static getDistinctCameras() {
-        return this.buildRequest("photos/cameras");
+        return this.doGet("photos/cameras");
     }
 
     static getAlbums(options) {
-        return this.buildRequest("albums", options);
+        return this.doGet("albums", options);
     }
 
     static getAlbum(name, options) {
-        return this.buildRequest(`albums/${encodeURIComponent(name)}`, options);
+        return this.doGet(`albums/${encodeURIComponent(name)}`, options);
+    }
+
+    static addPhotoToAlbum(photo, album) {
+        return this.doPost(
+            `photos/${encodeURIComponent(photo.id)}/albums/${encodeURIComponent(album.id)}`
+        );
+    }
+
+    static removePhotoFromAlbum(photo, album) {
+        return this.doDelete(
+            `photos/${encodeURIComponent(photo.id)}/albums/${encodeURIComponent(album.id)}`
+        );
     }
 
     static createAlbum(name, description = "") {

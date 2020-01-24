@@ -5,6 +5,7 @@ import PIL.Image
 from flask import Blueprint, g, abort, send_file, request, make_response
 from flask_restplus import Api, Resource, reqparse, inputs, fields
 from sqlalchemy.sql import func
+from sqlalchemy.orm import joinedload
 from werkzeug import urls
 
 from photodb.model import Photo, Album
@@ -18,6 +19,7 @@ ns = api.namespace("photos")
 photos_fields = sqla_resource_fields(Photo)
 del photos_fields["thumbnail_data"]
 del photos_fields["exif"]
+photos_fields["albums"] = fields.List(fields.Nested(sqla_resource_fields(Album)))
 
 photo_model = ns.model("photo", photos_fields)
 photo_search = ns.model(
@@ -127,7 +129,7 @@ class PhotosList(Resource):
         args = self.parser.parse_args()
         offset = (args.page - 1) * args.pagesize
 
-        query = g.session.query(Photo)
+        query = g.session.query(Photo).options(joinedload(Photo.albums))
         if args.album:
             album = g.session.query(Album).filter(Album.name == args.album).one_or_none()
             if not album:
@@ -161,7 +163,7 @@ class PhotoStats(Resource):
         return [{"name": row.camera} for row in g.session.query(Photo.camera).distinct()]
 
 
-@ns.route("/<int:photo_id>/album/<string:album_name_or_id>")
+@ns.route("/<int:photo_id>/albums/<string:album_name_or_id>")
 class Photos2Albums(Resource):
     @staticmethod
     def get_photo(photo_id: int) -> Photo:
@@ -178,7 +180,9 @@ class Photos2Albums(Resource):
         album = get_album(g.session, urls.url_unquote(album_name_or_id))
         if album is None:
             abort(404, "Album %r not found" % album_name_or_id)
+        return album
 
+    @api.marshal_with(photo_model)
     def post(self, photo_id, album_name_or_id):
 
         photo = self.get_photo(photo_id)
@@ -186,10 +190,10 @@ class Photos2Albums(Resource):
 
         if album not in photo.albums:
             photo.albums.add(album)
-            return make_response("", 201)
 
-        return make_response("", 200)
+        return photo
 
+    @api.marshal_with(photo_model)
     def delete(self, photo_id, album_name_or_id):
 
         photo = self.get_photo(photo_id)
@@ -198,4 +202,4 @@ class Photos2Albums(Resource):
         if album in photo.albums:
             photo.albums.remove(album)
 
-        return make_response("", 200)
+        return photo

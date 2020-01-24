@@ -1,30 +1,69 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../css/photos.css";
 import PhotosAPI from "./PhotosAPI";
+import { DropDown, DropDownItem } from "./bulma";
+import { IconButton, niceDate } from "./utils";
+import _ from "lodash";
 
-const dateOpts = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-};
+function PhotoAlbumDropDown(props) {
+    const [active, setActive] = useState(false);
+    const [albums, setAlbums] = useState([]);
+    const [activeAlbums, setActiveAlbums] = useState([]);
+    const toggleDropDown = () => setActive(!active);
 
-function niceDate(datestr) {
-    return new Date(datestr).toLocaleDateString(undefined, dateOpts);
-}
+    useEffect(() => {
+        if (active) {
+            PhotosAPI.getAlbums().then(setAlbums);
+            setActiveAlbums(_.clone(props.photo.albums.map(a => a.id)));
+        } else {
+            setAlbums([]);
+            setActiveAlbums([]);
+        }
+    }, [active, props.photo]);
 
-function IconButton(props) {
-    const iElem = <i className={"fas " + props.icon} />;
-    if (props.href !== undefined) {
-        return (
-            <a className="button has-text-white is-icon" href={props.href}>
-                {iElem}
-            </a>
-        );
-    } else {
-        return <button className="button has-text-white is-icon">{iElem}</button>;
+    function handleOnChange(e, album) {
+        console.log("New state: " + e.target.checked);
+
+        let request = null;
+        if (e.target.checked) {
+            request = PhotosAPI.addPhotoToAlbum(props.photo, album);
+        } else {
+            request = PhotosAPI.removePhotoFromAlbum(props.photo, album);
+        }
+        request.then(photo => {
+            console.log("Updated photo: " + JSON.stringify(photo));
+            setActiveAlbums(photo.albums.map(a => a.id));
+        });
     }
+
+    let elems = [];
+    if (active) {
+        elems = albums.map(a => {
+            return (
+                <DropDownItem key={a.name}>
+                    <label className="checkbox" htmlFor={a.name}>
+                        <input
+                            id={a.name}
+                            type="checkbox"
+                            checked={activeAlbums.indexOf(a.id) !== -1}
+                            style={{ marginRight: "1em" }}
+                            onChange={e => handleOnChange(e, a)}
+                        />
+                        {a.name}
+                    </label>
+                </DropDownItem>
+            );
+        });
+    }
+
+    return (
+        <DropDown
+            active={active}
+            trigger={IconButton({ icon: "fa-folder", onClick: toggleDropDown })}
+        >
+            {elems}
+        </DropDown>
+    );
 }
 
 function PhotoBox(props) {
@@ -56,7 +95,7 @@ function PhotoBox(props) {
                             className="has-text-white icon is-medium is-pulled-right"
                             style={{ justifyContent: "flex-end" }}
                         >
-                            <IconButton icon="fa-folder" />
+                            <PhotoAlbumDropDown photo={props.photo} />
                             <IconButton
                                 icon="fa-arrow-alt-circle-down"
                                 href={PhotosAPI.getPhotoDownloadUrl(props.photo)}

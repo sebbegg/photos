@@ -7,8 +7,7 @@ function updated(o, key, value) {
 }
 
 function AlbumCreator(props) {
-
-    const [album, setAlbum] = useState({name: "", description: ""});
+    const [album, setAlbum] = useState({ name: "", description: "" });
     const [mode, setMode] = useState("invalid");
     const [existingAlbums, setExistingAlbums] = useState([]);
 
@@ -79,7 +78,7 @@ function AlbumCreator(props) {
                                 placeholder="Album name"
                                 value={album.name}
                                 onChange={e => setAlbum(updated(album, "name", e.target.value))}
-                                disabled={mode==="done"}
+                                disabled={mode === "done"}
                             />
                             {mode === "valid" && (
                                 <span className="icon is-small is-right has-text-success">
@@ -98,7 +97,7 @@ function AlbumCreator(props) {
                                 onChange={e =>
                                     setAlbum(updated(album, "description", e.target.value))
                                 }
-                                disabled={mode==="done"}
+                                disabled={mode === "done"}
                             />
                         </div>
                     </div>

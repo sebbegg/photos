@@ -1,4 +1,5 @@
 import moment from "moment";
+import React from "react";
 
 function getParams() {}
 
@@ -42,4 +43,33 @@ function prettyDateRange(minDate, maxDate, fmt = "LL") {
     }
 }
 
+export function IconButton(props) {
+    const iElem = <i className={"fas " + props.icon} />;
+
+    if (props.href !== undefined) {
+        return (
+            <a className="button has-text-white is-icon" {...props}>
+                {iElem}
+            </a>
+        );
+    } else {
+        return (
+            <button className="button has-text-white is-icon" {...props}>
+                {iElem}
+            </button>
+        );
+    }
+}
+
 export { withQueryParam, getPhotosOpts, prettyDateRange };
+const dateOpts = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+};
+
+export function niceDate(datestr) {
+    return new Date(datestr).toLocaleDateString(undefined, dateOpts);
+}
