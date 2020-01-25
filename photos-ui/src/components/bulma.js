@@ -21,7 +21,12 @@ function DropDown(props) {
     return (
         <div className={classNames} {...unusedProps(props)}>
             <div className="dropdown-trigger">{props.trigger}</div>
-            <div className="dropdown-menu" id="dropdown-menu" role="menu" onMouseLeave={props.onMouseLeave}>
+            <div
+                className="dropdown-menu"
+                id="dropdown-menu"
+                role="menu"
+                onMouseLeave={props.onMouseLeave}
+            >
                 <div className="dropdown-content">{props.children}</div>
             </div>
         </div>

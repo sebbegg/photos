@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import PhotosAPI from "./PhotosAPI";
-import {Link, useHistory, useLocation} from "react-router-dom";
-import {prettyDateRange, withQueryParam} from "./utils";
+import { Link, useHistory, useLocation } from "react-router-dom";
+import { prettyDateRange, withQueryParam } from "./utils";
 import bulmaCalendar from "bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js";
 import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css";
-import {AlbumCreator} from "./modals";
+import { AlbumCreator } from "./modals";
 
 function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp = "name") {
     const params = new URLSearchParams(location.search);
@@ -15,7 +15,7 @@ function makeNavbarElems(location, objects, queryParam, displayProp = "name", qu
                     "navbar-item " + (o[queryProp] === params.get(queryParam) ? "is-active" : "")
                 }
                 key={o[queryProp]}
-                to={loc => withQueryParam(loc, {[queryParam]: o[queryProp]})}
+                to={loc => withQueryParam(loc, { [queryParam]: o[queryProp] })}
             >
                 {o[displayProp]}
             </Link>
@@ -73,7 +73,7 @@ function Navbar(props) {
     }
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
-            <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator}/>
+            <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator} />
             <div className="navbar-brand">
                 <a className="navbar-item" href="#">
                     {/*<img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>*/}
@@ -85,14 +85,14 @@ function Navbar(props) {
                     className="navbar-burger burger"
                     aria-label="menu"
                     aria-expanded="false"
-                    onClick={(e) => {
+                    onClick={e => {
                         document.getElementById("navbar").classList.toggle("is-active");
                         e.target.classList.toggle("is-active");
                     }}
                 >
-                    <span aria-hidden="true"/>
-                    <span aria-hidden="true"/>
-                    <span aria-hidden="true"/>
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
                 </a>
             </div>
 
@@ -105,14 +105,14 @@ function Navbar(props) {
                                 className={
                                     "navbar-item" + (params.get("album") ? "" : " is-active")
                                 }
-                                to={loc => withQueryParam(loc, {album: null})}
+                                to={loc => withQueryParam(loc, { album: null })}
                             >
                                 All
                             </Link>
                             <a className="navbar-item" onClick={() => setAlbumCreatorActive(true)}>
                                 New Album…
                             </a>
-                            {albumElems.length > 0 && <hr className="navbar-divider"/>}
+                            {albumElems.length > 0 && <hr className="navbar-divider" />}
                             {albumElems}
                         </div>
                     </div>
@@ -123,11 +123,11 @@ function Navbar(props) {
                                 className={
                                     "navbar-item" + (params.get("camera") ? "" : " is-active")
                                 }
-                                to={loc => withQueryParam(loc, {camera: null})}
+                                to={loc => withQueryParam(loc, { camera: null })}
                             >
                                 All
                             </Link>
-                            {cameraElems.length > 0 && <hr className="navbar-divider"/>}
+                            {cameraElems.length > 0 && <hr className="navbar-divider" />}
                             {cameraElems}
                         </div>
                     </div>
