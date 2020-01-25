@@ -63,6 +63,11 @@ class Album(Db):
     id: int = Column(BigInt, autoincrement=True, primary_key=True)
     name: str = Column(String(), unique=True)
     description: str = Column(String())
+    added_date: datetime.datetime = Column(DateTime, default=datetime.datetime.now)
+    modified_date: datetime.datetime = Column(DateTime, default=datetime.datetime.now)
+
+    def set_modified(self):
+        self.modified_date = datetime.datetime.now()
 
 
 @with_str
@@ -72,11 +77,13 @@ class Photo(Db):
     __table_args__ = (UniqueConstraint("path", "filename"),)
 
     id: int = Column(BigInt, autoincrement=True, primary_key=True)
+    added_date: datetime.datetime = Column(DateTime, index=True, default=datetime.datetime.now)
+    modified_date: datetime.datetime = Column(DateTime, default=datetime.datetime.now, index=True)
+
     path: str = Column(String)
     filename: str = Column(String)
     exif: dict = Column(JSON)
     capture_date: datetime = Column(DateTime, index=True)
-    added_date: datetime = Column(DateTime, index=True, default=datetime.datetime.now)
     thumbnail_data: bytes = Column(String)
     orientation: int = Column(Integer)
     camera: str = Column(String, index=True)
@@ -84,6 +91,9 @@ class Photo(Db):
     albums: set = relationship(
         Album, secondary=_photo_to_album, collection_class=set, backref=backref("photos", collection_class=set)
     )
+
+    def set_modified(self):
+        self.modified_date = datetime.datetime.now()
 
     @classmethod
     def from_path_and_exif(cls, path, exif):

@@ -18,7 +18,7 @@ ns = api.namespace("photos")
 
 photos_fields = sqla_resource_fields(Photo)
 del photos_fields["thumbnail_data"]
-del photos_fields["exif"]
+#del photos_fields["exif"]
 photos_fields["albums"] = fields.List(fields.Nested(sqla_resource_fields(Album)))
 
 photo_model = ns.model("photo", photos_fields)
@@ -189,6 +189,7 @@ class Photos2Albums(Resource):
         album = self.get_album(album_name_or_id)
 
         if album not in photo.albums:
+            album.set_modified()
             photo.albums.add(album)
 
         return photo
@@ -200,6 +201,7 @@ class Photos2Albums(Resource):
         album = self.get_album(album_name_or_id)
 
         if album in photo.albums:
+            album.set_modified()
             photo.albums.remove(album)
 
         return photo

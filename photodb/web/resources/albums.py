@@ -68,7 +68,7 @@ class AlbumList(Resource):
     
     @ns.marshal_with(album_model)
     def get(self):
-        return g.session.query(Album).all()
+        return g.session.query(Album).order_by(Album.modified_date.desc()).all()
 
     def post(self):
         album_dct = request.get_json()

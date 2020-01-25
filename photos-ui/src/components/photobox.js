@@ -60,6 +60,7 @@ function PhotoAlbumDropDown(props) {
         <DropDown
             active={active}
             trigger={IconButton({ icon: "fa-folder", onClick: toggleDropDown })}
+            onMouseLeave={() => setActive(false)}
         >
             {elems}
         </DropDown>
