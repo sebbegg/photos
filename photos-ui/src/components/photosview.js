@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import "bulma/css/bulma.css";
 import PhotoBox from "./photobox.js";
 import PhotosApi from "./PhotosAPI.js";
 import PagingControl from "./paging";
 
 import _ from "lodash";
-import { prettyDateRange } from "./utils";
+import {prettyDateRange} from "./utils";
 
 function AlbumHeader(props) {
     if (props.album === null) {
@@ -49,7 +49,7 @@ function PhotosView(props) {
     }, [props.albumName]);
 
     useEffect(() => {
-        let options = { page: page, pagesize: 24 };
+        let options = {page: page, pagesize: 24};
         if (album !== null && album.name !== "_all") {
             options.album = album.name;
         }
@@ -79,18 +79,20 @@ function PhotosView(props) {
         <div>
             <section className="hero is-dark">
                 <div className="hero-body">
-                    <AlbumHeader album={album} count={state.photos_count} />
+                    <AlbumHeader album={album} count={state.photos_count}/>
                 </div>
             </section>
             <div className="container">
-                <div className="columns is-multiline is-vcentered">
+                <div className="columns is-mobile is-multiline is-vcentered">
                     {state.photos.map(photo => (
-                        <PhotoBox
-                            key={photo.id}
-                            photo={photo}
-                            selected={state.selection[photo.id]}
-                            onClick={() => handlePhotoClicked(photo.id)}
-                        />
+                        <div className="column is-6-tablet is-4-desktop is-3-widescreen is-2-fullhd">
+                            <PhotoBox
+                                key={photo.id}
+                                photo={photo}
+                                selected={state.selection[photo.id]}
+                                onClick={() => handlePhotoClicked(photo.id)}
+                            />
+                        </div>
                     ))}
                 </div>
                 <PagingControl

@@ -69,7 +69,6 @@ function PhotoAlbumDropDown(props) {
 
 function PhotoBox(props) {
     return (
-        <div className="column is-6-tablet is-4-desktop is-3-widescreen is-2-fullhd">
             <div className="card">
                 <div className="card-image">
                     <figure className="image">
@@ -106,7 +105,6 @@ function PhotoBox(props) {
                     </div>
                 </div>
             </div>
-        </div>
     );
 }
 
