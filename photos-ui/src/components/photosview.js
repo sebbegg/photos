@@ -9,6 +9,14 @@ import PagingControl from "./paging";
 import { prettyDateRange } from "./utils";
 import "./../css/masonry.css";
 
+const breakpointColumns = {
+    default: 5,
+    1216: 4,
+    1024: 3,
+    769: 2,
+    500: 1
+};
+
 function AlbumHeader(props) {
     if (props.album === null) {
         return null;
@@ -86,7 +94,7 @@ function PhotosView(props) {
             </section>
             <div className="container">
                 <Masonry
-                    breakpointCols={3}
+                    breakpointCols={breakpointColumns}
                     className="masonry-grid"
                     columnClassName="masonry-grid-column"
                 >
