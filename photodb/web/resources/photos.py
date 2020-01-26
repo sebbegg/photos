@@ -95,7 +95,7 @@ class PhotoFiles(Resource):
             if 0 < args.size < image.size[0]:
                 # fix image width to size:
                 w, h = image.size
-                image.resize((args.size, round(args.size / w * h)))
+                image = image.resize((args.size, round(args.size / w * h)), resample=PIL.Image.BICUBIC)
 
             file_to_send = io.BytesIO()
             image.save(file_to_send, "jpeg")

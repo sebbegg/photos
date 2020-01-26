@@ -69,42 +69,42 @@ function PhotoAlbumDropDown(props) {
 
 function PhotoBox(props) {
     return (
-            <div className="card">
-                <div className="card-image">
-                    <figure className="image">
-                        <img
-                            src={PhotosAPI.getPhotoUrl(props.photo)}
-                            alt={props.photo.filename}
-                            onClick={props.onClick}
-                            style={{ minHeight: 100, width: "100%" }}
+        <div className="card">
+            <div className="card-image">
+                <figure className="image">
+                    <img
+                        src={PhotosAPI.getPhotoUrl(props.photo)}
+                        alt={props.photo.filename}
+                        onClick={props.onClick}
+                        style={{ minHeight: 100, width: "100%" }}
+                    />
+                </figure>
+            </div>
+
+            <div className="card-footer is-overlay" style={{ alignItems: "flex-end" }}>
+                <div className="hover-overlay" style={{ width: "100%" }}>
+                    <span
+                        className="has-text-white has-shadow has-text-weight-bold is-pulled-left"
+                        style={{ marginLeft: "0.5em" }}
+                    >
+                        <p className="is-size-7">{props.photo.filename}</p>
+                        <p className="is-size-7">{niceDate(props.photo.capture_date)}</p>
+                    </span>
+
+                    <span
+                        className="has-text-white icon is-medium is-pulled-right"
+                        style={{ justifyContent: "flex-end" }}
+                    >
+                        <PhotoAlbumDropDown photo={props.photo} />
+                        <IconButton
+                            icon="fa-arrow-alt-circle-down"
+                            href={PhotosAPI.getPhotoDownloadUrl(props.photo)}
                         />
-                    </figure>
-                </div>
-
-                <div className="card-footer is-overlay" style={{ alignItems: "flex-end" }}>
-                    <div className="hover-overlay" style={{ width: "100%" }}>
-                        <span
-                            className="has-text-white has-shadow has-text-weight-bold is-pulled-left"
-                            style={{ marginLeft: "0.5em" }}
-                        >
-                            <p className="is-size-7">{props.photo.filename}</p>
-                            <p className="is-size-7">{niceDate(props.photo.capture_date)}</p>
-                        </span>
-
-                        <span
-                            className="has-text-white icon is-medium is-pulled-right"
-                            style={{ justifyContent: "flex-end" }}
-                        >
-                            <PhotoAlbumDropDown photo={props.photo} />
-                            <IconButton
-                                icon="fa-arrow-alt-circle-down"
-                                href={PhotosAPI.getPhotoDownloadUrl(props.photo)}
-                            />
-                            <IconButton icon="fa-info-circle" />
-                        </span>
-                    </div>
+                        <IconButton icon="fa-info-circle" />
+                    </span>
                 </div>
             </div>
+        </div>
     );
 }
 

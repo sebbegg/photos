@@ -35,10 +35,8 @@ function Navbar(props) {
 
     const [albumCreatorActive, setAlbumCreatorActive] = useState(false);
     const closeAlbumCreator = () => {
-        console.log("Closing album creator in navbar");
         setAlbumCreatorActive(false);
     };
-    console.log("Rendering navbar with albumcreator: " + albumCreatorActive);
 
     useEffect(() => {
         PhotosAPI.getAlbums().then(setAlbums);

@@ -49,7 +49,7 @@ function AlbumCreator(props) {
             valid = false;
         }
         setMode(valid ? "valid" : "invalid");
-    }, [album, existingAlbums]);
+    }, [album, albumExists, existingAlbums]);
 
     let help = { classes: "is-success", text: "That album name is fine!" };
     if (albumExists) {
