@@ -62,7 +62,7 @@ class PhotoFiles(Resource):
 
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "size", type=inputs.int_range(0, 1_000_000), default=500, help="Crop image to be at most this many pixels high or wide",
+        "size", type=inputs.int_range(0, 1_000_000), default=500, help="Scale image to fixed width",
     )
     parser.add_argument(
         "download", type=inputs.boolean, default=False, help="If 'true', return image as attachment",
@@ -91,9 +91,11 @@ class PhotoFiles(Resource):
             image = PIL.Image.open(file_to_send)
             assert isinstance(image, PIL.Image.Image)
 
-            if 0 < args.size < max(image.size):
-                image.thumbnail((args.size, args.size))
             image = normalize_exif_orientation(image, photo.orientation)
+            if 0 < args.size < image.size[0]:
+                # fix image width to size:
+                w, h = image.size
+                image.resize((args.size, round(args.size / w * h)))
 
             file_to_send = io.BytesIO()
             image.save(file_to_send, "jpeg")
