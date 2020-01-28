@@ -1,5 +1,5 @@
-from photodb.web.app import create_app
-from photodb.model import SourceFolder
+from photos.web.app import create_app
+from photos.model import SourceFolder
 import sqlalchemy.exc as sa_exc
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 from flask import Blueprint, g
 from flask_restplus import Resource, Namespace
 
-from photodb.model import Photo, SourceFolder
-from photodb.scanner import ImageScanner
+from photos.model import Photo, SourceFolder
+from photos.scanner import ImageScanner
 
 scanner_blueprint = Blueprint("scanner", __name__)
 ns = Namespace("scan")

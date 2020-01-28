@@ -1,6 +1,6 @@
 import pathlib
-from photodb.scanner import ImageScanner
-from photodb.model import Photo
+from photos.scanner import ImageScanner
+from photos.model import Photo
 
 TEST_IMAGES = pathlib.Path(__file__).parent / "some_images"
 

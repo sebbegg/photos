@@ -5,7 +5,7 @@ from flask import g, abort, request, make_response
 from flask_restplus import Resource, fields, Namespace
 from werkzeug import urls
 
-from photodb.model import Album, Photo
+from photos.model import Album, Photo
 from .utils import sqla_resource_fields
 
 ns = Namespace("albums")

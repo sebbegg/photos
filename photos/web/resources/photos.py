@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func
 from werkzeug import urls
 
-from photodb.model import Photo, Album
+from photos.model import Photo, Album
 from .albums import get_album
 from .utils import sqla_resource_fields
 

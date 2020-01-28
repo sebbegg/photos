@@ -33,4 +33,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # npm built stuff
-/photodb/web/static/
+/photos/web/static/

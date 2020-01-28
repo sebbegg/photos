@@ -5,8 +5,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import create_session
 
-from photodb.model import Photo, Db
-from photodb.scanner import ImageScanner
+from photos.model import Photo, Db
+from photos.scanner import ImageScanner
 
 TEST_IMAGES = pathlib.Path(__file__).parent / "some_images"
 

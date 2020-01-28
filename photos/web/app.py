@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 from sqlalchemy import create_engine
 from .resources import photos_api, react_blueprint, photos_blueprint
-from photodb.model import Db
+from photos.model import Db
 
 from sqlalchemy.orm import sessionmaker
 
