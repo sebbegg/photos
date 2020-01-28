@@ -3,8 +3,8 @@ import "bulma/css/bulma.css";
 import _ from "lodash";
 import Masonry from "react-masonry-css";
 
-import PhotoBox from "./photobox.js";
-import PhotosApi from "./PhotosAPI.js";
+import PhotoBox from "./photobox";
+import PhotosApi from "./PhotosAPI";
 import PagingControl from "./paging";
 import { prettyDateRange } from "./utils";
 import "./../css/masonry.css";
@@ -92,7 +92,7 @@ function PhotosView(props) {
                     <AlbumHeader album={album} count={state.photos_count} />
                 </div>
             </section>
-            <div className="container">
+            <div className="container" style={{ marginTop: "10px" }}>
                 <Masonry
                     breakpointCols={breakpointColumns}
                     className="masonry-grid"

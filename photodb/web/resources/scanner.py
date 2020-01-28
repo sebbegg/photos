@@ -1,18 +1,14 @@
-import collections
-import json
-
 from flask import Blueprint, g
-from flask_restplus import Api, Resource
+from flask_restplus import Resource, Namespace
 
-from photodb.scanner import ImageScanner
 from photodb.model import Photo, SourceFolder
-
+from photodb.scanner import ImageScanner
 
 scanner_blueprint = Blueprint("scanner", __name__)
-api = Api(scanner_blueprint)
+ns = Namespace("scan")
 
 
-@api.route("/scan")
+@ns.route("")
 class Scan(Resource):
     def post(self):
 

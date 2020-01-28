@@ -7,7 +7,7 @@ function setRoot(root) {
 
 class PhotosAPI {
     static buildURI(resource, options) {
-        let uri = "http://localhost:5000/";
+        let uri = "http://localhost:5000/api/";
 
         uri = uri + resource;
 

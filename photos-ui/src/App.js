@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import Gallery from "./components/gallery";
 import Navbar from "./components/navbar";
 import SlideShow from "./components/slideshow";
@@ -17,7 +17,7 @@ class App extends Component {
                         <Gallery />
                     </Route>
                     <Route>
-                        <p>Nothing here</p>
+                        <Redirect to="/ui/gallery" />
                     </Route>
                 </Switch>
             </Router>

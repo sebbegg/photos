@@ -15,4 +15,5 @@ if __name__ == "__main__":
     finally:
         session.close()
 
+    print("Serving static from: " + app.static_folder)
     app.run(debug=True, host="0.0.0.0", port=5000)

@@ -2,28 +2,26 @@ import io
 import os
 
 import PIL.Image
-from flask import Blueprint, g, abort, send_file, request, make_response
-from flask_restplus import Api, Resource, reqparse, inputs, fields
-from sqlalchemy.sql import func
+from flask import g, abort, send_file, request
+from flask_restplus import Resource, reqparse, inputs, fields, Namespace
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import func
 from werkzeug import urls
 
 from photodb.model import Photo, Album
 from .albums import get_album
 from .utils import sqla_resource_fields
 
-photos_blueprint = Blueprint("photos", __name__)
-api = Api(photos_blueprint)
-ns = api.namespace("photos")
+ns = Namespace("photos")
+album_model = ns.model("Album", sqla_resource_fields(Album))
 
 photos_fields = sqla_resource_fields(Photo)
 del photos_fields["thumbnail_data"]
-#del photos_fields["exif"]
-photos_fields["albums"] = fields.List(fields.Nested(sqla_resource_fields(Album)))
+photos_fields["albums"] = fields.List(fields.Nested(album_model))
 
-photo_model = ns.model("photo", photos_fields)
+photo_model = ns.model("Photo", photos_fields)
 photo_search = ns.model(
-    "searchresult",
+    "SearchResult",
     {
         "page": fields.Integer,
         "page_size": fields.Integer,
@@ -35,7 +33,8 @@ photo_search = ns.model(
 
 @ns.route("/<int:id>")
 class Photos(Resource):
-    @ns.marshal_with(photos_fields)
+
+    @ns.marshal_with(photo_model)
     def get(self, id):
         photo = g.session.query(Photo).get(id)
         if photo is None:
@@ -126,7 +125,7 @@ class PhotosList(Resource):
         "max_date", type=inputs.datetime_from_iso8601, default=None, help="Restrict to photos captured before max_date"
     )
 
-    @api.marshal_with(photo_search)
+    @ns.marshal_with(photo_search)
     def get(self):
         args = self.parser.parse_args()
         offset = (args.page - 1) * args.pagesize
@@ -184,7 +183,7 @@ class Photos2Albums(Resource):
             abort(404, "Album %r not found" % album_name_or_id)
         return album
 
-    @api.marshal_with(photo_model)
+    @ns.marshal_with(photo_model)
     def post(self, photo_id, album_name_or_id):
 
         photo = self.get_photo(photo_id)
@@ -196,7 +195,7 @@ class Photos2Albums(Resource):
 
         return photo
 
-    @api.marshal_with(photo_model)
+    @ns.marshal_with(photo_model)
     def delete(self, photo_id, album_name_or_id):
 
         photo = self.get_photo(photo_id)

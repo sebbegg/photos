@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bulma/css/bulma.css";
 import PhotosAPI from "./PhotosAPI";
 import { Link, useLocation } from "react-router-dom";
-import { getPhotosOpts } from "./utils";
+import { closeFullscreen, getPhotosOpts, openFullscreen } from "./utils";
 
 import _ from "lodash";
 
@@ -26,9 +26,9 @@ const toggleFullHeight = () => {
 
 const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
-        document.getElementById("slideshow").requestFullscreen();
+        openFullscreen(document.getElementById("slideshow"));
     } else {
-        document.exitFullscreen();
+        closeFullscreen();
     }
 };
 

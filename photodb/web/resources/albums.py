@@ -1,22 +1,20 @@
 import sqlalchemy.orm
 import sqlalchemy.orm.exc as sa_exc
 import sqlalchemy.sql as sa_sql
-from flask import Blueprint, g, abort, request, make_response
-from flask_restplus import Api, Resource, fields
+from flask import g, abort, request, make_response
+from flask_restplus import Resource, fields, Namespace
 from werkzeug import urls
 
 from photodb.model import Album, Photo
 from .utils import sqla_resource_fields
 
-albums_blueprint = Blueprint("albums", __name__)
-api = Api(albums_blueprint)
-ns = api.namespace(albums_blueprint.name)
+ns = Namespace("albums")
 
 album_fields = sqla_resource_fields(Album)
 album_fields["min_date"] = fields.DateTime
 album_fields["max_date"] = fields.DateTime
 album_fields["photo_count"] = fields.Integer
-album_model = ns.model("album", album_fields)
+album_model = ns.model("ExtendedAlbum", album_fields)
 
 
 def get_album(session: sqlalchemy.orm.Session, name_or_id):

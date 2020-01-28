@@ -1,5 +1,15 @@
-from .albums import albums_blueprint
-from .photos import photos_blueprint
-from .scanner import scanner_blueprint
+from flask import Blueprint
+from flask_restplus import Api
 
-all_blueprints = [photos_blueprint, scanner_blueprint, albums_blueprint]
+from .albums import ns as album_ns
+from .photos import ns as photo_ns
+from .react import react_blueprint
+from .scanner import ns as scanner_ns
+
+photos_blueprint = Blueprint("photos", __name__)
+photos_api = Api(photos_blueprint)
+photos_api.add_namespace(album_ns)
+photos_api.add_namespace(photo_ns)
+photos_api.add_namespace(scanner_ns)
+
+__all__ = ["photos_blueprint", "react_blueprint"]
