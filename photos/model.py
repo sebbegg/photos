@@ -3,7 +3,17 @@ import os
 import json
 import pathlib
 
-from sqlalchemy import Column, String, JSON, DateTime, BigInteger, Integer, Table, ForeignKey, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    String,
+    JSON,
+    DateTime,
+    BigInteger,
+    Integer,
+    Table,
+    ForeignKey,
+    UniqueConstraint,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
@@ -16,7 +26,12 @@ Db = declarative_base()
 def with_str(cls):
     def make_str(cls, attrs):
 
-        fmt_string = cls.__name__ + "(" + ", ".join("{a}={{self.{a}!r}}".format(a=attr.key) for attr in attrs) + ")"
+        fmt_string = (
+            cls.__name__
+            + "("
+            + ", ".join("{a}={{self.{a}!r}}".format(a=attr.key) for attr in attrs)
+            + ")"
+        )
 
         def __str__(self):
             return fmt_string.format(self=self)
@@ -89,7 +104,10 @@ class Photo(Db):
     camera: str = Column(String, index=True)
 
     albums: set = relationship(
-        Album, secondary=_photo_to_album, collection_class=set, backref=backref("photos", collection_class=set)
+        Album,
+        secondary=_photo_to_album,
+        collection_class=set,
+        backref=backref("photos", collection_class=set),
     )
 
     def set_modified(self):
@@ -128,6 +146,8 @@ def add_photo_to_album(session, photo: Photo, album: Album):
 
 
 def delete_photo_from_album(session, photo: Photo, album: Album):
-    stmt = _photo_to_album.delete(whereclause=(_photo_to_album.c.photo_id == 1) & (_photo_to_album.c.album_id == 1))
+    stmt = _photo_to_album.delete(
+        whereclause=(_photo_to_album.c.photo_id == 1) & (_photo_to_album.c.album_id == 1)
+    )
     session.execute(stmt)
     session.commit()

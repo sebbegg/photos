@@ -1,13 +1,11 @@
 import os
 
 from flask import Flask, g, current_app
-from flask_cors import CORS
-
 from sqlalchemy import create_engine
-from .resources import photos_api, react_blueprint, photos_blueprint
-from photos.model import Db
-
 from sqlalchemy.orm import sessionmaker
+
+from photos.model import Db
+from .resources import react_blueprint, photos_blueprint
 
 
 def new_session():
