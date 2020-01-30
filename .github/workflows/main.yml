@@ -12,9 +12,21 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: 13.2.0
+        node-version: "13.2.0"
     - name: npm build photos-ui
       run: |
         cd photos-ui
         npm install
-        npm run build        
+        npm run build       
+    - name: Use python ${{ matrix.node-version }}
+      uses: actions/setup-python@1
+      with:
+        python-version: "3.7.0"
+    - name: Python build and test
+      run: |
+        pip install -U pip
+        pip install pipenv
+        pipenv sync
+        pipenv run pre-commit run -a
+        pipenv run pytest
+        
