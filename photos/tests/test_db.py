@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import create_session
 
 from photos.model import Photo, Db
-from photos.scanner import ImageScanner
 
 TEST_IMAGES = pathlib.Path(__file__).parent / "some_images"
 
@@ -25,16 +24,10 @@ def db_session(db_engine):
 
 def test_insert(db_session):
 
-    image = Photo(path="some_path", exif={}, datetime=datetime.datetime.now())
+    image = Photo(path="some_path", exif={}, capture_date=datetime.datetime.now())
 
     db_session.add(image)
     db_session.flush()
 
-
-def test_inserts_from_scanner(db_session):
-
-    scanner = ImageScanner(TEST_IMAGES)
-    for path, exif_tags in scanner:
-        db_session.add(Photo.from_path_and_exif(path, exif_tags))
-
-    db_session.flush()
+    image2 = db_session.query(Photo).filter(Photo.path == "some_path").one()
+    assert image2 is not None

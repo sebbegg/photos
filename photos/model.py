@@ -123,7 +123,7 @@ class Photo(Db):
 
         thumbnail_data = exif.pop("JPEGThumbnail", None)
         orientation = exif.get("Image Orientation", 1)
-        camera = "/".join((exif.get("Image Make"), exif.get("Image Model")))
+        camera = "/".join((exif.get("Image Make", ""), exif.get("Image Model", "")))
         if camera == "/":
             camera = None
         path = pathlib.Path(path)

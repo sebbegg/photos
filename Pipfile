@@ -7,6 +7,7 @@ verify_ssl = true
 black = "*"
 pytest = "*"
 pre-commit = "*"
+pytest-coverage = "*"
 
 [packages]
 exifread = "*"
