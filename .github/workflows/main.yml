@@ -26,6 +26,6 @@ jobs:
         run: |
           pip install -U pip
           pip install pipenv
-          pipenv sync --dev
-          pipenv run pre-commit run -a
-          pipenv run pytest
+          pipenv lock --dev -r > requirements.txt && pip install -r requirements.txt
+          pre-commit run -a
+          pytest photos/tests
