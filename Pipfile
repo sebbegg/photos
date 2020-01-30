@@ -6,15 +6,16 @@ verify_ssl = true
 [dev-packages]
 black = "*"
 pytest = "*"
+pre-commit = "*"
+pytest-coverage = "*"
 
 [packages]
 exifread = "*"
 attrs = "*"
-sqlalchemy = "*"
-flask = "*"
+sqlalchemy = "~=1.3.0"
+flask = "~=1.1"
 flask-restplus = "*"
-flask-cors = "*"
-pillow = "*"
+pillow = "~=7.0"
 
 [requires]
 python_version = "3.7"

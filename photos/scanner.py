@@ -12,9 +12,10 @@ def _exifread(path: str) -> dict:
     def _plain_value(v):
         if isinstance(v, exifread.IfdTag):
             if isinstance(v.values, list):
-                v = [repr(elem) if isinstance(elem, exifread.utils.Ratio)
-                     else elem
-                     for elem in v.values]
+                v = [
+                    repr(elem) if isinstance(elem, exifread.utils.Ratio) else elem
+                    for elem in v.values
+                ]
                 if len(v) == 1:
                     v = v[0]
             else:

@@ -1,13 +1,11 @@
 import os
 
 from flask import Flask, g, current_app
-from flask_cors import CORS
-
 from sqlalchemy import create_engine
-from .resources import photos_api, react_blueprint, photos_blueprint
-from photos.model import Db
-
 from sqlalchemy.orm import sessionmaker
+
+from photos.model import Db
+from .resources import react_blueprint, photos_blueprint
 
 
 def new_session():
@@ -22,7 +20,7 @@ def close_session(response):
 
 def create_app():
 
-    app = Flask("photosdb", static_folder=os.path.join(os.path.dirname(__file__), "static"))
+    app = Flask("photos", static_folder=os.path.join(os.path.dirname(__file__), "static"))
     from werkzeug.contrib.fixers import ProxyFix
 
     app.wsgi_app = ProxyFix(app.wsgi_app)

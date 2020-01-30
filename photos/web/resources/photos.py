@@ -33,7 +33,6 @@ photo_search = ns.model(
 
 @ns.route("/<int:id>")
 class Photos(Resource):
-
     @ns.marshal_with(photo_model)
     def get(self, id):
         photo = g.session.query(Photo).get(id)
@@ -64,7 +63,10 @@ class PhotoFiles(Resource):
         "size", type=inputs.int_range(0, 1_000_000), default=500, help="Scale image to fixed width",
     )
     parser.add_argument(
-        "download", type=inputs.boolean, default=False, help="If 'true', return image as attachment",
+        "download",
+        type=inputs.boolean,
+        default=False,
+        help="If 'true', return image as attachment",
     )
 
     @classmethod
@@ -94,13 +96,17 @@ class PhotoFiles(Resource):
             if 0 < args.size < image.size[0]:
                 # fix image width to size:
                 w, h = image.size
-                image = image.resize((args.size, round(args.size / w * h)), resample=PIL.Image.BICUBIC)
+                image = image.resize(
+                    (args.size, round(args.size / w * h)), resample=PIL.Image.BICUBIC
+                )
 
             file_to_send = io.BytesIO()
             image.save(file_to_send, "jpeg")
             file_to_send.seek(0)
 
-        response = send_file(file_to_send, as_attachment=args.download, attachment_filename=photo.filename)
+        response = send_file(
+            file_to_send, as_attachment=args.download, attachment_filename=photo.filename,
+        )
         response.set_etag(etag)
         return response
 
@@ -117,12 +123,20 @@ class PhotosList(Resource):
     parser.add_argument(
         "album", type=str, default=None, help="Return photos only from album",
     )
-    parser.add_argument("camera", type=str, default=None, help="Restrict to photos from the specified camera")
     parser.add_argument(
-        "min_date", type=inputs.datetime_from_iso8601, default=None, help="Restrict to photos captured after min_date"
+        "camera", type=str, default=None, help="Restrict to photos from the specified camera",
     )
     parser.add_argument(
-        "max_date", type=inputs.datetime_from_iso8601, default=None, help="Restrict to photos captured before max_date"
+        "min_date",
+        type=inputs.datetime_from_iso8601,
+        default=None,
+        help="Restrict to photos captured after min_date",
+    )
+    parser.add_argument(
+        "max_date",
+        type=inputs.datetime_from_iso8601,
+        default=None,
+        help="Restrict to photos captured before max_date",
     )
 
     @ns.marshal_with(photo_search)
@@ -141,6 +155,7 @@ class PhotosList(Resource):
             query = query.filter(Photo.camera == args.camera)
 
         import datetime
+
         if args.min_date and args.max_date:
             args.max_date += datetime.timedelta(days=1) - datetime.timedelta(microseconds=1)
             query = query.filter(Photo.capture_date.between(args.min_date, args.max_date))
@@ -154,7 +169,7 @@ class PhotosList(Resource):
             "page": args.page,
             "page_size": args.pagesize,
             "photos_count": count_query.scalar(),
-            "photos": query.order_by(Photo.capture_date.desc())[offset:offset + args.pagesize],
+            "photos": query.order_by(Photo.capture_date.desc())[offset : offset + args.pagesize],
         }
 
 

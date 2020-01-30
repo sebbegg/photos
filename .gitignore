@@ -16,7 +16,7 @@ photos-ui.pnp.js
 
 # testing
 photos-ui/coverage
-tests/.pytest_cache
+photos/tests/.pytest_cache
 
 # production
 photos-ui/build
@@ -34,3 +34,9 @@ yarn-error.log*
 
 # npm built stuff
 /photos/web/static/
+
+# python build stuff
+/htmlcov
+/data
+/coverage.xml
+/.coverage
