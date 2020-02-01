@@ -1,0 +1,14 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+  photos-app:
+    build: .
+    environment:
+      PHOTOS_DB_URL: postgres://postgres:mysecretpassword@postgres:5432
+      GUNICORN_CMD_ARGS: "--bind=0.0.0.0:80 --worker-class=gevent --workers=4"
+    restart: always
+    ports:
+      - "8080:80"

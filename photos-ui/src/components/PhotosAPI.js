@@ -1,13 +1,6 @@
-let apiRoot = "";
-
-function setRoot(root) {
-    console.log("Setting root: " + root);
-    apiRoot = root;
-}
-
 class PhotosAPI {
     static buildURI(resource, options) {
-        let uri = "http://localhost:5000/api/";
+        let uri = "/api/";
 
         uri = uri + resource;
 
@@ -98,4 +91,3 @@ class PhotosAPI {
 }
 
 export default PhotosAPI;
-export { setRoot };

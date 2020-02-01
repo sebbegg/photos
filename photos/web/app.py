@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from photos.model import Db
 from .resources import react_blueprint, photos_blueprint
+from photos import config
 
 
 def new_session():
@@ -31,7 +32,7 @@ def create_app():
     app.before_request(new_session)
     app.after_request(close_session)
 
-    engine = create_engine("sqlite:///photosdb.sqlite", echo=True)
+    engine = create_engine(config.PHOTOS_DB_URL, echo=True)
     app.sessionfactory = sessionmaker(engine)
     Db.metadata.create_all(engine)
 

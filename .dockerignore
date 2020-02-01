@@ -1,0 +1,4 @@
+photos-ui/node_modules
+photos/tests
+data*
+*.sqlite
