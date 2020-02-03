@@ -7,7 +7,7 @@ from .react import react_blueprint
 from .scanner import ns as scanner_ns
 
 photos_blueprint = Blueprint("photos", __name__)
-photos_api = Api(photos_blueprint)
+photos_api = Api(photos_blueprint, validate=True)
 photos_api.add_namespace(album_ns)
 photos_api.add_namespace(photo_ns)
 photos_api.add_namespace(scanner_ns)

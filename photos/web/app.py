@@ -1,12 +1,10 @@
-import os
-
 from flask import Flask, g, current_app
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from photos import config
 from photos.model import Db
 from .resources import react_blueprint, photos_blueprint
-from photos import config
 
 
 def new_session():
@@ -21,7 +19,7 @@ def close_session(response):
 
 def create_app():
 
-    app = Flask("photos", static_folder=os.path.join(os.path.dirname(__file__), "static"))
+    app = Flask("photos", config.STATIC_FOLDER)
     from werkzeug.contrib.fixers import ProxyFix
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
@@ -32,7 +30,7 @@ def create_app():
     app.before_request(new_session)
     app.after_request(close_session)
 
-    engine = create_engine(config.PHOTOS_DB_URL, echo=True)
+    engine = create_engine(config.DB_URL, echo=True)
     app.sessionfactory = sessionmaker(engine)
     Db.metadata.create_all(engine)
 
