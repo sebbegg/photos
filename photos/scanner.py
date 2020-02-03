@@ -61,6 +61,10 @@ class ImageScanner:
             if stats.st_ctime < last_scanned and stats.st_mtime < last_scanned:
                 continue
 
+            # skip hidden files/folders
+            if entry.name.startswith("."):
+                continue
+
             if entry.is_file():
                 type, enc = mimetypes.guess_type(entry.name)
                 if type and type.startswith("image"):
