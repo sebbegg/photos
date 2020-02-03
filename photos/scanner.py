@@ -1,11 +1,14 @@
 import base64
 import mimetypes
+import logging
 import os
 import datetime
 import pathlib
 
 import attr
 import exifread
+
+log = logging.getLogger(__name__)
 
 
 def _exifread(path: str) -> dict:
@@ -45,7 +48,10 @@ class ImageScanner:
             self.last_scan_stats = {}
         self.scan_stats = self.last_scan_stats.copy()
 
-        yield from self._scan(self.dirname)
+        try:
+            yield from self._scan(self.dirname)
+        except FileNotFoundError:
+            log.error("Folder not found: %s", self.dirname)
 
     def _key_for_direntry(self, dirname: str):
         return str(pathlib.Path(dirname).relative_to(self.dirname))
@@ -76,26 +82,3 @@ class ImageScanner:
                     yield entry.path, _exifread(entry.path)
             elif entry.is_dir():
                 yield from self._scan(entry.path)
-
-
-if __name__ == "__main__":
-    import sys
-    import time
-    import json
-
-    last_scan = {}
-    while True:
-        scanner = ImageScanner(sys.argv[1], last_scan_stats=last_scan)
-
-        count = 0
-        for count, (path, exif) in enumerate(scanner):
-            pass
-        print(f"Found {count} images")
-        last_scan = scanner.scan_stats
-
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            break
-
-    print(json.dumps(scanner.scan_stats, indent=4))

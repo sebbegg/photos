@@ -176,7 +176,10 @@ class PhotosList(Resource):
 @ns.route("/cameras")
 class PhotoStats(Resource):
     def get(self):
-        return [{"name": row.camera} for row in g.session.query(Photo.camera).distinct()]
+        return [
+            {"name": row.camera}
+            for row in g.session.query(Photo.camera).filter(Photo.camera != None).distinct()  # noqa
+        ]
 
 
 @ns.route("/<int:photo_id>/albums/<string:album_name_or_id>")
