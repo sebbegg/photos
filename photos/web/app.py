@@ -30,7 +30,7 @@ def create_app():
     app.before_request(new_session)
     app.after_request(close_session)
 
-    engine = create_engine(config.DB_URL, echo=True)
+    engine = create_engine(config.DB_URL)
     app.sessionfactory = sessionmaker(engine)
     Db.metadata.create_all(engine)
 
