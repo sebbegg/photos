@@ -57,12 +57,17 @@ class ImageScanner:
         self.scan_stats[relative_dir] = datetime.datetime.now().timestamp()
 
         for entry in os.scandir(dirname):
-            stats = entry.stat()
-            if stats.st_ctime < last_scanned and stats.st_mtime < last_scanned:
-                continue
-
             # skip hidden files/folders
             if entry.name.startswith("."):
+                continue
+
+            try:
+                stats = entry.stat()
+            except FileNotFoundError:
+                # not sure why this can happen..., as we're using scandir
+                continue
+
+            if stats.st_ctime < last_scanned and stats.st_mtime < last_scanned:
                 continue
 
             if entry.is_file():
