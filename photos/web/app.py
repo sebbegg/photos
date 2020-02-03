@@ -1,6 +1,7 @@
 from flask import Flask, g, current_app
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from werkzeug.contrib.fixers import ProxyFix
 
 from photos import config
 from photos.model import Db
@@ -19,8 +20,7 @@ def close_session(response):
 
 def create_app():
 
-    app = Flask("photos", config.STATIC_FOLDER)
-    from werkzeug.contrib.fixers import ProxyFix
+    app = Flask("photos", static_folder=config.STATIC_FOLDER)
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
 
