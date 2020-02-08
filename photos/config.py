@@ -5,7 +5,7 @@ import photos
 DB_URL = "sqlite:///photosdb.sqlite"
 STATIC_FOLDER = os.path.join(os.path.dirname(photos.__file__), "web", "static")
 LOGLEVEL = "INFO"
-SQLA_ECHO = True
+SQLA_ECHO = False
 ALBUM_REGEX = re.compile(r"\w\w\w+")
 
 for key in list(locals()):

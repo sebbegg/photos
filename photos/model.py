@@ -139,18 +139,3 @@ class Photo(Db):
             orientation=orientation,
             camera=camera,
         )
-
-
-def add_photo_to_album(session, photo: Photo, album: Album):
-
-    stmt = _photo_to_album.insert().values(photo_id=photo.id, album_id=album.id)
-    session.execute(stmt)
-    session.commit()
-
-
-def delete_photo_from_album(session, photo: Photo, album: Album):
-    stmt = _photo_to_album.delete(
-        whereclause=(_photo_to_album.c.photo_id == 1) & (_photo_to_album.c.album_id == 1)
-    )
-    session.execute(stmt)
-    session.commit()
