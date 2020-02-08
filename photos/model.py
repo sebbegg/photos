@@ -1,5 +1,4 @@
 import datetime
-import os
 import json
 import pathlib
 
@@ -58,7 +57,8 @@ class SourceFolder(Db):
 
     __tablename__ = "sourcefolders"
 
-    folder: str = Column(String, primary_key=True)
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    folder: str = Column(String, unique=True)
     _stats: str = Column("stats", String, default=None)
 
     @property
@@ -89,7 +89,7 @@ class Album(Db):
 class Photo(Db):
 
     __tablename__ = "photos"
-    __table_args__ = (UniqueConstraint("path", "filename"),)
+    __table_args__ = (UniqueConstraint("path", "filename", name="fullpath"),)
 
     id: int = Column(BigInt, autoincrement=True, primary_key=True)
     added_date: datetime.datetime = Column(DateTime, index=True, default=datetime.datetime.now)
@@ -114,19 +114,22 @@ class Photo(Db):
         self.modified_date = datetime.datetime.now()
 
     @classmethod
-    def from_path_and_exif(cls, path, exif):
+    def from_path_and_exif(cls, path: pathlib.Path, exif):
+
+        if isinstance(path, str):
+            path = pathlib.Path(path)
 
         if EXIF_DATEKEY in exif:
             dt = datetime.datetime.strptime(exif[EXIF_DATEKEY], EXIF_DATEFMT)
         else:
-            dt = datetime.datetime.fromtimestamp(os.stat(path).st_ctime)
+            dt = datetime.datetime.fromtimestamp(path.stat().st_ctime)
 
         thumbnail_data = exif.pop("JPEGThumbnail", None)
         orientation = exif.get("Image Orientation", 1)
         camera = "/".join((exif.get("Image Make", ""), exif.get("Image Model", "")))
         if camera == "/":
             camera = None
-        path = pathlib.Path(path)
+
         return cls(
             path=str(path.parent),
             filename=path.name,

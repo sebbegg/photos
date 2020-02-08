@@ -1,16 +1,17 @@
 import contextlib
-import functools
 import datetime
+import functools
+import json
 import logging
 import os
-import json
 
 import click
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
+
 import photos.config as config
-from photos.model import SourceFolder, Photo
-from photos.scanner import ImageScanner
+from photos.model import SourceFolder
+from photos.scanner import scan_source_folder
 
 log = logging.getLogger("photos.cli")
 
@@ -68,31 +69,7 @@ def with_lockfile(lock_name):
     return decorator
 
 
-COMMIT_BATCH_SIZE = 100
-
-
-def scan_source_folder(session: Session, source: SourceFolder):
-
-    scanner = ImageScanner(source.folder, last_scan_stats=source.stats)
-
-    n = 0
-    for n, (path, exif) in enumerate(scanner):
-        session.add(Photo.from_path_and_exif(path, exif))
-
-        if n > 0 and n % COMMIT_BATCH_SIZE == 0:
-            source.stats = scanner.scan_stats
-            session.commit()
-
-    if n % COMMIT_BATCH_SIZE:
-        source.stats = scanner.scan_stats
-        session.commit()
-
-    click.echo("...found %d new images." % n)
-
-
-@cli.command()
-@click.option("--folder", default=None)
-def scan(folder=None):
+def _do_scan(folder):
 
     engine = create_engine(config.DB_URL, echo=config.SQLA_ECHO)
     session = sessionmaker(engine)()
@@ -101,15 +78,29 @@ def scan(folder=None):
     if folder is not None:
         query = query.filter_by(folder=folder)
 
+    source_folders = query.all()
+    for source in source_folders:
+        click.echo("Scanning: %s" % source.folder)
+        scan_source_folder(session, source)
+
+    if not source_folders:
+        click.echo("No source folders configured")
+
+
+@cli.command()
+@click.option("--folder", default=None)
+def scan(folder=None):
+
+    import time
+
+    time.sleep(5)
     with lockfile_context("/tmp/photos_scan_run") as existing_lock:
         if existing_lock is not None:
             click.echo("An instance of this command is already running:")
             click.echo("Started by {user} at {created_at}".format(**existing_lock))
             return 1
 
-        for source in query:
-            click.echo("Scanning: %s" % source.folder)
-            scan_source_folder(session, source)
+        _do_scan(folder)
 
     return 0
 

@@ -1,10 +1,13 @@
+import logging
 import pathlib
 
 from flask import Blueprint, g, request, make_response
-from flask_restplus import Resource, Namespace, fields
+from flask_restplus import Resource, Namespace, fields, abort
 
-from photos.model import Photo, SourceFolder
-from photos.scanner import ImageScanner
+from photos.model import SourceFolder
+from photos.scanner import scan_source_folder
+
+log = logging.getLogger(__name__)
 
 sources_blueprint = Blueprint("sources", __name__)
 ns = Namespace("sources")
@@ -18,13 +21,8 @@ class Scan(Resource):
 
         counts = dict()
         for source in g.session.query(SourceFolder):
-
-            scanner = ImageScanner(source.folder, last_scan_stats=source.stats)
-            counts[source.folder] = 0
-            for path, exif in scanner:
-                g.session.add(Photo.from_path_and_exif(path, exif))
-                counts[source.folder] += 1
-            source.stats = scanner.scan_stats
+            n_photos = scan_source_folder(g.session, source)
+            counts[source.folder] = n_photos
 
         return counts
 
@@ -46,6 +44,8 @@ class SourceFolders(Resource):
     @ns.marshal_with(folder_fields)
     def get(self, folder):
         if folder:
-            return g.session.query(SourceFolder).get(folder)
+            f = g.session.query(SourceFolder).get(folder)
+            if f is None:
+                abort(404, "Folder not found.")
         else:
             return g.session.query(SourceFolder).all()
