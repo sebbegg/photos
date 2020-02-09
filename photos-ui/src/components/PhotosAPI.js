@@ -1,6 +1,6 @@
 class PhotosAPI {
     static buildURI(resource, options) {
-        let uri = "/api/";
+        let uri = process.env.REACT_APP_API_HOST + "/api/";
 
         uri = uri + resource;
 

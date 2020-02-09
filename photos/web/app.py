@@ -7,6 +7,13 @@ from photos import config
 from photos.model import Db
 from .resources import react_blueprint, photos_blueprint
 
+try:
+    from flask_cors import CORS
+except ImportError:
+
+    def CORS(app):
+        pass
+
 
 def new_session():
     g.session = current_app.sessionfactory()
@@ -21,6 +28,7 @@ def close_session(response):
 def create_app():
 
     app = Flask("photos", static_folder=config.STATIC_FOLDER)
+    CORS(app)
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
 

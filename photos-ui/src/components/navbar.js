@@ -5,6 +5,7 @@ import { prettyDateRange, withQueryParam } from "./utils";
 import bulmaCalendar from "bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js";
 import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css";
 import { AlbumCreator } from "./modals";
+import _ from "lodash";
 
 function makeNavbarElems(location, objects, queryParam, displayProp = "name", queryProp = "name") {
     const params = new URLSearchParams(location.search);
@@ -23,6 +24,25 @@ function makeNavbarElems(location, objects, queryParam, displayProp = "name", qu
     });
 }
 
+function NavbarDropDown(props) {
+    const [active, setActive] = useState(false);
+
+    return (
+        <div className={"navbar-item has-dropdown" + (active ? " is-active" : "")}>
+            <a className="navbar-link" onClick={() => setActive(!active)}>
+                {props.title}
+            </a>
+            <div
+                className="navbar-dropdown"
+                onMouseLeave={() => setActive(false)}
+                onClick={() => setActive(false)}
+            >
+                {props.children}
+            </div>
+        </div>
+    );
+}
+
 function Navbar(props) {
     const [albums, setAlbums] = useState([]);
     const [cameras, setCameras] = useState([]);
@@ -31,7 +51,7 @@ function Navbar(props) {
     const params = new URLSearchParams(location.search);
 
     const albumElems = makeNavbarElems(location, albums, "album");
-    const cameraElems = makeNavbarElems(location, cameras, "camera");
+    const cameraElems = makeNavbarElems(location, cameras, "camera", "name", "id");
 
     const [albumCreatorActive, setAlbumCreatorActive] = useState(false);
     const closeAlbumCreator = () => {
@@ -42,7 +62,13 @@ function Navbar(props) {
         PhotosAPI.getAlbums().then(setAlbums);
     }, []);
     useEffect(() => {
-        PhotosAPI.getDistinctCameras().then(setCameras);
+        PhotosAPI.getDistinctCameras()
+            .then(cameras =>
+                cameras.map(cam => {
+                    return { id: cam.name, name: _.upperFirst(cam.name.replace("/", " ")) };
+                })
+            )
+            .then(setCameras);
     }, []);
 
     const history = useHistory();
@@ -96,43 +122,33 @@ function Navbar(props) {
 
             <div id="navbar" className="navbar-menu">
                 <div className="navbar-start">
-                    <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">Albums</a>
-                        <div className="navbar-dropdown">
-                            <Link
-                                className={
-                                    "navbar-item" + (params.get("album") ? "" : " is-active")
-                                }
-                                to={loc => withQueryParam(loc, { album: null })}
-                            >
-                                All
-                            </Link>
-                            <a className="navbar-item" onClick={() => setAlbumCreatorActive(true)}>
-                                New Album…
-                            </a>
-                            {albumElems.length > 0 && <hr className="navbar-divider" />}
-                            {albumElems}
-                        </div>
-                    </div>
-                    <div className="navbar-item has-dropdown is-hoverable">
-                        <a className="navbar-link">Cameras</a>
-                        <div className="navbar-dropdown">
-                            <Link
-                                className={
-                                    "navbar-item" + (params.get("camera") ? "" : " is-active")
-                                }
-                                to={loc => withQueryParam(loc, { camera: null })}
-                            >
-                                All
-                            </Link>
-                            {cameraElems.length > 0 && <hr className="navbar-divider" />}
-                            {cameraElems}
-                        </div>
-                    </div>
+                    <NavbarDropDown title="Albums">
+                        <Link
+                            className={"navbar-item" + (params.get("album") ? "" : " is-active")}
+                            to={loc => withQueryParam(loc, { album: null })}
+                        >
+                            All
+                        </Link>
+                        <a className="navbar-item" onClick={() => setAlbumCreatorActive(true)}>
+                            New Album…
+                        </a>
+                        {albumElems.length > 0 && <hr className="navbar-divider" />}
+                        {albumElems}
+                    </NavbarDropDown>
+                    <NavbarDropDown title="Cameras">
+                        <Link
+                            className={"navbar-item" + (params.get("camera") ? "" : " is-active")}
+                            to={loc => withQueryParam(loc, { camera: null })}
+                        >
+                            All
+                        </Link>
+                        {cameraElems.length > 0 && <hr className="navbar-divider" />}
+                        {cameraElems}
+                    </NavbarDropDown>
                     <div className="navbar-item has-dropdown is-hoverable">
                         <div className="navbar-link">
                             <a className="icon has-text-grey">
-                                <i className="fas fa-calendar-alt"></i>
+                                <i className="fas fa-calendar-alt" />
                             </a>
                             <div className="is-centered">
                                 <div className="has-text-centered is-size-7">{minDateStr}</div>
@@ -161,7 +177,7 @@ function Navbar(props) {
                                 className="button is-link"
                                 to={loc => `/ui/slideshow${loc.search}`}
                             >
-                                <i className="fas fa-tv"></i>
+                                <i className="fas fa-tv" />
                             </Link>
                         </div>
                     </div>

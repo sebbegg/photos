@@ -59,7 +59,8 @@ function PhotosView(props) {
     }, [props.albumName]);
 
     useEffect(() => {
-        let options = { page: page, pagesize: 24 };
+        let options = { page: page, pagesize: 48 };
+
         if (album !== null && album.name !== "_all") {
             options.album = album.name;
         }
@@ -93,6 +94,11 @@ function PhotosView(props) {
                 </div>
             </section>
             <div className="container" style={{ marginTop: "10px" }}>
+                <PagingControl
+                    pageCount={state.page_count}
+                    currentPage={state.page}
+                    onClick={page => setPage(page)}
+                />
                 <Masonry
                     breakpointCols={breakpointColumns}
                     className="masonry-grid"
@@ -108,12 +114,12 @@ function PhotosView(props) {
                         </div>
                     ))}
                 </Masonry>
+                <PagingControl
+                    pageCount={state.page_count}
+                    currentPage={state.page}
+                    onClick={page => setPage(page)}
+                />
             </div>
-            <PagingControl
-                pageCount={state.page_count}
-                currentPage={state.page}
-                onClick={page => setPage(page)}
-            />
         </div>
     );
 }

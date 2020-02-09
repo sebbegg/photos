@@ -149,6 +149,12 @@
     animation: fadeIn 0.5s;
 }
 
+.dropdown-content,
+.navbar-dropdown {
+    overflow: scroll;
+    max-height: 50vh;
+}
+
 @keyframes fadeIn {
     0% {
         opacity: 0;
