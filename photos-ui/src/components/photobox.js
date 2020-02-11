@@ -70,7 +70,26 @@ function PhotoAlbumDropDown(props) {
 
 function PhotoBox(props) {
     const location = useLocation();
+    const [showModal, setShowModal] = useState(false);
 
+    let modal = null;
+    if (showModal) {
+        let photoUrl = PhotosAPI.getPhotoUrl(props.photo, { size: 0 });
+        modal = (
+            <div className="modal is-active">
+                <div className="modal-background" />
+                <div
+                    className="modal-content full-page-background has-background-black"
+                    onClick={() => setShowModal(false)}
+                    style={{
+                        backgroundImage: `url('${photoUrl}')`,
+                        maxHeight: "100vh",
+                        width: "100%"
+                    }}
+                />
+            </div>
+        );
+    }
     return (
         <div className="card">
             <div className="card-image">
@@ -83,8 +102,12 @@ function PhotoBox(props) {
                     />
                 </figure>
             </div>
-
-            <div className="card-footer is-overlay" style={{ alignItems: "flex-end" }}>
+            {modal}
+            <div
+                className="card-footer is-overlay"
+                style={{ alignItems: "flex-end" }}
+                onClick={() => setShowModal(!showModal)}
+            >
                 <div className="hover-overlay" style={{ width: "100%", height: "100%" }}>
                     <div
                         className="has-text-white has-shadow has-text-weight-bold"
