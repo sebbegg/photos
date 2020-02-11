@@ -1,9 +1,7 @@
 import moment from "moment";
 import React from "react";
 
-function getParams() {}
-
-function withQueryParam(location, params) {
+function updateLocation(location, params, pathname = undefined) {
     let current = new URLSearchParams(location.search);
     Object.entries(params).forEach(([key, value]) => {
         if (value === null || value === undefined) {
@@ -12,7 +10,8 @@ function withQueryParam(location, params) {
             current.set(key, value);
         }
     });
-    return `${location.pathname}?${current.toString()}`;
+    let path = pathname === undefined ? location.pathname : pathname;
+    return `${path}?${current.toString()}`;
 }
 
 function getPhotosOpts(location) {
@@ -45,23 +44,25 @@ function prettyDateRange(minDate, maxDate, fmt = "LL") {
 
 export function IconButton(props) {
     const iElem = <i className={"fas " + props.icon} />;
+    const className = "button has-text-white is-icon";
+    const style = { paddingLeft: "0.5em", paddingRight: "0.5em" };
 
     if (props.href !== undefined) {
         return (
-            <a className="button has-text-white is-icon" {...props}>
+            <a className={className} {...props} style={style}>
                 {iElem}
             </a>
         );
     } else {
         return (
-            <button className="button has-text-white is-icon" {...props}>
+            <button className={className} {...props} style={style}>
                 {iElem}
             </button>
         );
     }
 }
 
-export { withQueryParam, getPhotosOpts, prettyDateRange };
+export { updateLocation, getPhotosOpts, prettyDateRange };
 const dateOpts = {
     year: "numeric",
     month: "short",

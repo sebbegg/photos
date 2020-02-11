@@ -53,23 +53,44 @@ function SlideShow(props) {
     };
 
     const [photos, setPhotos] = useState([]);
-    const [current, setCurrent] = useState(0);
+    const [current, setCurrent] = useState(undefined);
     const location = useLocation();
+    const start = parseInt(new URLSearchParams(location.search).get("start"));
+    const photoOpts = getPhotosOpts(location.search);
 
     useEffect(() => {
-        PhotosAPI.getPhotos(getPhotosOpts(location)).then(result => {
+        let opts = getPhotosOpts(location);
+        opts.pagesize = 0;
+        PhotosAPI.getPhotos(opts).then(result => {
             if (result === undefined) {
                 result = { photos: [] };
             }
             setPhotos(result.photos);
         });
-    }, [location]);
+    }, [photoOpts]);
 
-    const photo = photos[current];
-    if (photos.length === 0) {
-        return null;
+    let startIndex = undefined;
+    if (current === undefined) {
+        if (isNaN(start)) {
+            setCurrent(0);
+        } else {
+            // find start-photo by id
+            startIndex = _.findIndex(photos, ["id", start]);
+        }
     }
-    const photoUrl = `url('${PhotosAPI.getPhotoUrl(photo, { size: 0 })}')`;
+
+    let photoUrl;
+    if (photos.length > 0) {
+        let photo;
+        if (current === undefined && startIndex !== undefined) {
+            photo = photos[startIndex];
+            setCurrent(startIndex);
+        } else {
+            photo = photos[current];
+        }
+        photoUrl = `url('${PhotosAPI.getPhotoUrl(photo, { size: 0 })}')`;
+    }
+
     return (
         <div
             id="slideshow"

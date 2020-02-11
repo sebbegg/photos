@@ -143,6 +143,7 @@ class PhotosList(Resource):
     def get(self):
         args = self.parser.parse_args()
         offset = (args.page - 1) * args.pagesize
+        end = (offset + args.pagesize) if args.pagesize > 0 else None
 
         query = g.session.query(Photo).options(joinedload(Photo.albums))
         if args.album:
@@ -169,7 +170,7 @@ class PhotosList(Resource):
             "page": args.page,
             "page_size": args.pagesize,
             "photos_count": count_query.scalar(),
-            "photos": query.order_by(Photo.capture_date.desc())[offset : offset + args.pagesize],
+            "photos": query.order_by(Photo.capture_date.desc())[offset:end],
         }
 
 

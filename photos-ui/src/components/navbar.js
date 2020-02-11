@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PhotosAPI from "./PhotosAPI";
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { prettyDateRange, withQueryParam } from "./utils";
+import { prettyDateRange, updateLocation } from "./utils";
 import bulmaCalendar from "bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js";
 import "bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css";
 import { AlbumCreator } from "./modals";
@@ -16,7 +16,7 @@ function makeNavbarElems(location, objects, queryParam, displayProp = "name", qu
                     "navbar-item " + (o[queryProp] === params.get(queryParam) ? "is-active" : "")
                 }
                 key={o[queryProp]}
-                to={loc => withQueryParam(loc, { [queryParam]: o[queryProp] })}
+                to={loc => updateLocation(loc, { [queryParam]: o[queryProp] })}
             >
                 {o[displayProp]}
             </Link>
@@ -81,7 +81,7 @@ function Navbar(props) {
             setCalendar(cal);
             cal.on("select clear", () => {
                 history.push(
-                    withQueryParam(location, {
+                    updateLocation(location, {
                         minDate: cal.startDate && cal.startDate.toISOString().slice(0, 10),
                         maxDate: cal.endDate && cal.endDate.toISOString().slice(0, 10)
                     })
@@ -100,8 +100,7 @@ function Navbar(props) {
             <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator} />
             <div className="navbar-brand">
                 <a className="navbar-item" href="#">
-                    {/*<img src="https://bulma.io/images/bulma-logo.png" alt="logo" width="112" height="28"/>*/}
-                    <p>Fotos</p>
+                    <img src="/logo.svg" alt="logo" width="32" height="32" />
                 </a>
 
                 <a
@@ -125,7 +124,7 @@ function Navbar(props) {
                     <NavbarDropDown title="Albums">
                         <Link
                             className={"navbar-item" + (params.get("album") ? "" : " is-active")}
-                            to={loc => withQueryParam(loc, { album: null })}
+                            to={loc => updateLocation(loc, { album: null })}
                         >
                             All
                         </Link>
@@ -138,7 +137,7 @@ function Navbar(props) {
                     <NavbarDropDown title="Cameras">
                         <Link
                             className={"navbar-item" + (params.get("camera") ? "" : " is-active")}
-                            to={loc => withQueryParam(loc, { camera: null })}
+                            to={loc => updateLocation(loc, { camera: null })}
                         >
                             All
                         </Link>

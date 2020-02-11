@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import "../css/photos.css";
 import PhotosAPI from "./PhotosAPI";
 import { DropDown, DropDownItem } from "./bulma";
-import { IconButton, niceDate } from "./utils";
+import { IconButton, niceDate, updateLocation } from "./utils";
 import _ from "lodash";
+import { useLocation } from "react-router-dom";
 
 function PhotoAlbumDropDown(props) {
     const [active, setActive] = useState(false);
@@ -68,6 +69,8 @@ function PhotoAlbumDropDown(props) {
 }
 
 function PhotoBox(props) {
+    const location = useLocation();
+
     return (
         <div className="card">
             <div className="card-image">
@@ -82,18 +85,17 @@ function PhotoBox(props) {
             </div>
 
             <div className="card-footer is-overlay" style={{ alignItems: "flex-end" }}>
-                <div className="hover-overlay" style={{ width: "100%" }}>
-                    <span
-                        className="has-text-white has-shadow has-text-weight-bold is-pulled-left"
-                        style={{ marginLeft: "0.5em" }}
+                <div className="hover-overlay" style={{ width: "100%", height: "100%" }}>
+                    <div
+                        className="has-text-white has-shadow has-text-weight-bold"
+                        style={{ marginLeft: "1em", marginTop: ".5em" }}
                     >
                         <p className="is-size-7">{props.photo.filename}</p>
                         <p className="is-size-7">{niceDate(props.photo.capture_date)}</p>
-                    </span>
-
-                    <span
-                        className="has-text-white icon is-medium is-pulled-right"
-                        style={{ justifyContent: "flex-end" }}
+                    </div>
+                    <div
+                        className="has-text-white is-medium"
+                        style={{ position: "absolute", bottom: 0 }}
                     >
                         <PhotoAlbumDropDown photo={props.photo} />
                         <IconButton
@@ -101,7 +103,15 @@ function PhotoBox(props) {
                             href={PhotosAPI.getPhotoDownloadUrl(props.photo)}
                         />
                         <IconButton icon="fa-info-circle" />
-                    </span>
+                        <IconButton
+                            icon="fa-expand"
+                            href={updateLocation(
+                                location,
+                                { start: props.photo.id },
+                                "/ui/slideshow"
+                            )}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
