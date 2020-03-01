@@ -119,4 +119,35 @@ function AlbumCreator(props) {
     );
 }
 
-export { AlbumCreator };
+function ExiInfoModal(props) {
+    const rows = Object.keys(props.photo.exif).map((key, index) => {
+        const value = props.photo.exif[key];
+        if (_.isNumber(value) || _.isString(value)) {
+            return (
+                <tr>
+                    <td>{key.replace(/^EXIF /i, "")}</td>
+                    <td>{value}</td>
+                </tr>
+            );
+        }
+    });
+    return (
+        <div className="modal is-active">
+            <div className="modal-background" onClick={props.onClick} />
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Exif info</p>
+                    <button class="delete" aria-label="close" onClick={props.onClick}></button>
+                </header>
+                <section class="modal-card-body">
+                    <table className="table is-striped">
+                        <tbody>{rows}</tbody>
+                    </table>
+                </section>
+                <footer class="modal-card-foot"></footer>
+            </div>
+        </div>
+    );
+}
+
+export { AlbumCreator, ExiInfoModal };

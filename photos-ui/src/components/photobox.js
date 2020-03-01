@@ -5,6 +5,7 @@ import { DropDown, DropDownItem } from "./bulma";
 import { IconButton, niceDate, updateLocation } from "./utils";
 import _ from "lodash";
 import { useLocation } from "react-router-dom";
+import { ExiInfoModal } from "./modals";
 
 function PhotoAlbumDropDown(props) {
     const [active, setActive] = useState(false);
@@ -68,28 +69,29 @@ function PhotoAlbumDropDown(props) {
     );
 }
 
+function FullScreenModal(props) {
+    let photoUrl = PhotosAPI.getPhotoUrl(props.photo, { size: 0 });
+    return (
+        <div className="modal is-active">
+            <div className="modal-background" />
+            <div
+                className="modal-content full-page-background has-background-black"
+                onClick={props.onClick}
+                style={{
+                    backgroundImage: `url('${photoUrl}')`,
+                    maxHeight: "100vh",
+                    width: "100%"
+                }}
+            />
+        </div>
+    );
+}
+
 function PhotoBox(props) {
     const location = useLocation();
     const [showModal, setShowModal] = useState(false);
+    const [showExif, setShowExif] = useState(false);
 
-    let modal = null;
-    if (showModal) {
-        let photoUrl = PhotosAPI.getPhotoUrl(props.photo, { size: 0 });
-        modal = (
-            <div className="modal is-active">
-                <div className="modal-background" />
-                <div
-                    className="modal-content full-page-background has-background-black"
-                    onClick={() => setShowModal(false)}
-                    style={{
-                        backgroundImage: `url('${photoUrl}')`,
-                        maxHeight: "100vh",
-                        width: "100%"
-                    }}
-                />
-            </div>
-        );
-    }
     return (
         <div className="card">
             <div className="card-image">
@@ -102,7 +104,10 @@ function PhotoBox(props) {
                     />
                 </figure>
             </div>
-            {modal}
+            {showModal && (
+                <FullScreenModal photo={props.photo} onClick={() => setShowModal(false)} />
+            )}
+            {showExif && <ExiInfoModal photo={props.photo} onClick={() => setShowExif(false)} />}
             <div
                 className="card-footer is-overlay"
                 style={{ alignItems: "flex-end" }}
@@ -119,13 +124,14 @@ function PhotoBox(props) {
                     <div
                         className="has-text-white is-medium"
                         style={{ position: "absolute", bottom: 0 }}
+                        onClick={e => e.stopPropagation()}
                     >
                         <PhotoAlbumDropDown photo={props.photo} />
                         <IconButton
                             icon="fa-arrow-alt-circle-down"
                             href={PhotosAPI.getPhotoDownloadUrl(props.photo)}
                         />
-                        <IconButton icon="fa-info-circle" />
+                        <IconButton icon="fa-info-circle" onClick={() => setShowExif(true)} />
                         <IconButton
                             icon="fa-expand"
                             href={updateLocation(
