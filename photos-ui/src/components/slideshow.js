@@ -52,6 +52,19 @@ function SlideShow(props) {
         });
     };
 
+    const onKeyDown = keyEvent => {
+        switch (keyEvent.key) {
+            case "ArrowRight":
+                incrementCurrent(1);
+                break;
+            case "ArrowLeft":
+                incrementCurrent(-1);
+                break;
+            default:
+                break;
+        }
+    };
+
     const [photos, setPhotos] = useState([]);
     const [current, setCurrent] = useState(undefined);
     const location = useLocation();
@@ -67,7 +80,7 @@ function SlideShow(props) {
             }
             setPhotos(result.photos);
         });
-    }, [photoOpts]);
+    }, [photoOpts, location]);
 
     let startIndex = undefined;
     if (current === undefined) {
@@ -90,6 +103,11 @@ function SlideShow(props) {
         }
         photoUrl = `url('${PhotosAPI.getPhotoUrl(photo, { size: 0 })}')`;
     }
+
+    // make sure the keyDown-element is focused
+    useEffect(() => {
+        document.getElementById("focus-elem").focus();
+    });
 
     return (
         <div
@@ -119,7 +137,12 @@ function SlideShow(props) {
                     </button>
                 </div>
             </nav>
-            <div className="columns is-gapless is-mobile is-vcentered full-height">
+            <div
+                id="focus-elem"
+                className="columns is-gapless is-mobile is-vcentered full-height"
+                tabIndex="0"
+                onKeyDown={onKeyDown}
+            >
                 <div className="column is-1">
                     <SlideShowButton dir="left" onClick={() => incrementCurrent(-1)} />
                 </div>
