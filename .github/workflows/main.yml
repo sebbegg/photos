@@ -37,10 +37,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . \
-          --label "build.build-no=$GITHUB_RUN_NUMBER"\
-          --label "build.build-git-hash=$GITHUB_SHA"\
-          --file Dockerfile --tag $IMAGE_NAME
+          docker build . --label "build.build-no=$GITHUB_RUN_NUMBER" --label "build.build-git-hash=$GITHUB_SHA" --file Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
