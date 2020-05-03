@@ -17,6 +17,8 @@ jobs:
         with:
           node-version: "13.2.0"
       - name: npm build photos-ui
+        env:
+          CI: false
         run: |
           cd photos-ui
           npm install
