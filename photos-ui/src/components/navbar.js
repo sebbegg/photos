@@ -100,7 +100,12 @@ function Navbar(props) {
             <AlbumCreator active={albumCreatorActive} close={closeAlbumCreator} />
             <div className="navbar-brand">
                 <a className="navbar-item" href="#">
-                    <img src="/static/logo.svg" alt="logo" width="32" height="32" />
+                    <img
+                        src="/static/logo.svg"
+                        alt="this should be a logo"
+                        width="32"
+                        height="32"
+                    />
                 </a>
 
                 <a
